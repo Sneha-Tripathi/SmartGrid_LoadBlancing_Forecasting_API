@@ -1,11 +1,12 @@
 from fastapi import FastAPI
 
 from app.api.router import api_router
+from app.core.config import settings
 
 app = FastAPI(
-    title="Smart Grid Load Balancing API",
-    version="1.0.0",
-    description="Backend API for Smart Grid Load Balancing & Forecasting"
+    title=settings.PROJECT_NAME,
+    version=settings.PROJECT_VERSION,
+    description=settings.PROJECT_DESCRIPTION,
 )
 
 app.include_router(api_router)
