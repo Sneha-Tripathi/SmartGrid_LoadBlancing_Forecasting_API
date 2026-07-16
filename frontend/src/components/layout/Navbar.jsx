@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { NavLink } from "react-router-dom";
 import {
   FaBolt,
   FaBars,
@@ -9,11 +10,11 @@ import {
 import Button from "../common/Button";
 
 const navItems = [
-  "Home",
-  "Features",
-  "Solutions",
-  "Dashboard",
-  "Contact",
+  { name: "Home", path: "/" },
+  { name: "Features", path: "#features" },
+  { name: "Solutions", path: "#solutions" },
+  { name: "Dashboard", path: "/dashboard" },
+  { name: "Contact", path: "#contact" },
 ];
 
 export default function Navbar() {
@@ -89,23 +90,33 @@ export default function Navbar() {
 
           <nav className="flex items-center gap-7">
 
-            {navItems.map((item) => (
-              <a
-                key={item}
-                href="#"
-                className="
-                  text-[15px]
-                  font-medium
-                  text-slate-300
-                  hover:text-teal-400
-                  transition
-                "
-              >
-                {item}
-              </a>
-            ))}
+  {navItems.map((item) =>
+    item.path.startsWith("/") ? (
+      <NavLink
+        key={item.name}
+        to={item.path}
+        className={({ isActive }) =>
+          `text-[15px] font-medium transition ${
+            isActive
+              ? "text-teal-400"
+              : "text-slate-300 hover:text-teal-400"
+          }`
+        }
+      >
+        {item.name}
+      </NavLink>
+    ) : (
+      <a
+        key={item.name}
+        href={item.path}
+        className="text-[15px] font-medium text-slate-300 hover:text-teal-400 transition"
+      >
+        {item.name}
+      </a>
+    )
+  )}
 
-          </nav>
+</nav>
 
           {/* RIGHT */}
 

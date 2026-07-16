@@ -1,11 +1,10 @@
-import Home from "./pages/Home";
+import { BrowserRouter } from "react-router-dom";
+import AppRoutes from "./routes/AppRoutes";
 
-function App() {
+export default function App() {
   return (
-    <div className="min-h-screen bg-[#050816] text-white overflow-x-hidden">
-      <Home />
-    </div>
+    <BrowserRouter>
+      <AppRoutes />
+    </BrowserRouter>
   );
 }
-
-export default App;
