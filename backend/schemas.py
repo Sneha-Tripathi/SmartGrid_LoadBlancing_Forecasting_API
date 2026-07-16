@@ -9,6 +9,14 @@ class MeterDataCreate(BaseModel):
     frequency: float
 
 
+
+class MeterDataUpdate(BaseModel):
+    voltage: float
+    current: float
+    power: float
+    frequency: float
+
+
 class MeterDataResponse(BaseModel):
     id: int
     timestamp: datetime

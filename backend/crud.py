@@ -19,3 +19,36 @@ def create_meter_data(db: Session, data):
 
 def get_all_meter_data(db: Session):
     return db.query(MeterData).all()
+
+
+def get_meter_data_by_id(db: Session, meter_id: int):
+    return db.query(MeterData).filter(MeterData.id == meter_id).first()
+
+
+def update_meter_data(db: Session, meter_id: int, data):
+    meter = db.query(MeterData).filter(MeterData.id == meter_id).first()
+
+    if meter is None:
+        return None
+
+    meter.voltage = data.voltage
+    meter.current = data.current
+    meter.power = data.power
+    meter.frequency = data.frequency
+
+    db.commit()
+    db.refresh(meter)
+
+    return meter
+
+
+def delete_meter_data(db: Session, meter_id: int):
+    meter = db.query(MeterData).filter(MeterData.id == meter_id).first()
+
+    if meter is None:
+        return None
+
+    db.delete(meter)
+    db.commit()
+
+    return meter
