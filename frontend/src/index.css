@@ -1,1 +1,29 @@
 @import "tailwindcss";
+.section{
+    width:100%;
+    max-width:1280px;
+    margin:0 auto;
+    padding-left:40px;
+    padding-right:40px;
+}
+
+@media (max-width:1024px){
+    .section{
+        padding-left:32px;
+        padding-right:32px;
+    }
+}
+
+@media (max-width:768px){
+    .section{
+        padding-left:24px;
+        padding-right:24px;
+    }
+}
+
+@media (max-width:480px){
+    .section{
+        padding-left:18px;
+        padding-right:18px;
+    }
+}
