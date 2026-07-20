@@ -8,6 +8,8 @@ class Settings(BaseSettings):
         "Backend API for Smart Grid Load Balancing & Forecasting"
     )
 
+    DATABASE_URL: str = "sqlite:///./smartgrid.db"
+
     model_config = SettingsConfigDict(
         env_file=".env",
         extra="ignore"
