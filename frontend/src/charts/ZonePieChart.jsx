@@ -1,91 +1,72 @@
 import {
-  ResponsiveContainer,
   PieChart,
   Pie,
-  Cell,
   Tooltip,
-  Legend,
+  ResponsiveContainer,
+  Cell,
 } from "recharts";
 
-const zoneData = [
-  { name: "North", value: 28 },
-  { name: "South", value: 22 },
-  { name: "East", value: 18 },
-  { name: "West", value: 17 },
-  { name: "Central", value: 15 },
-];
+import useApi from "../hooks/useApi";
+import energyService from "../services/energyService";
 
 const COLORS = [
   "#14B8A6",
   "#0EA5E9",
-  "#6366F1",
-  "#8B5CF6",
-  "#F59E0B",
+  "#FACC15",
+  "#EF4444",
+];
+
+const dummyZones = [
+  { name: "North", value: 35 },
+  { name: "South", value: 25 },
+  { name: "East", value: 20 },
+  { name: "West", value: 20 },
 ];
 
 export default function ZonePieChart() {
+
+  const { data } =
+    useApi(() => energyService.getZoneDistribution());
+
+  const zones = data || dummyZones;
+
   return (
-    <div className="bg-[#101827] border border-slate-800 rounded-2xl p-6 h-[380px]">
 
-      {/* Header */}
+    <div className="bg-[#101827] border border-slate-800 rounded-2xl p-6">
 
-      <div className="mb-6">
+      <h2 className="text-xl text-white font-semibold mb-5">
 
-        <h2 className="text-xl font-semibold text-white">
-          Zone Distribution
-        </h2>
+        Zone Distribution
 
-        <p className="text-slate-400 text-sm mt-1">
-          Current energy load distribution across all zones
-        </p>
+      </h2>
 
-      </div>
-
-      {/* Pie Chart */}
-
-      <ResponsiveContainer width="100%" height="82%">
+      <ResponsiveContainer width="100%" height={250}>
 
         <PieChart>
 
           <Pie
-            data={zoneData}
-            cx="50%"
-            cy="50%"
-            outerRadius={105}
-            innerRadius={55}
-            paddingAngle={4}
+            data={zones}
             dataKey="value"
+            nameKey="name"
+            outerRadius={90}
           >
-            {zoneData.map((entry, index) => (
+
+            {zones.map((entry,index)=>(
               <Cell
-                key={`cell-${index}`}
+                key={index}
                 fill={COLORS[index % COLORS.length]}
               />
             ))}
+
           </Pie>
 
-          <Tooltip
-            contentStyle={{
-              background: "#0F172A",
-              border: "1px solid #334155",
-              borderRadius: "10px",
-              color: "#ffffff",
-            }}
-          />
-
-          <Legend
-            verticalAlign="bottom"
-            wrapperStyle={{
-              color: "#CBD5E1",
-              fontSize: "14px",
-              paddingTop: "12px",
-            }}
-          />
+          <Tooltip/>
 
         </PieChart>
 
       </ResponsiveContainer>
 
     </div>
+
   );
 }

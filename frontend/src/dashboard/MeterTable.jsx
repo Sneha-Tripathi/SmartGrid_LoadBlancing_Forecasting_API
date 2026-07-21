@@ -1,71 +1,70 @@
-import { meterData } from "../data/dashboardData";
+import useApi from "../hooks/useApi";
+import dashboardService from "../services/dashboardService";
+
+const dummyMeters = [
+  {
+    id: "MTR-1001",
+    zone: "North",
+    load: "245 kW",
+    voltage: "228 V",
+    status: "Active",
+  },
+  {
+    id: "MTR-1002",
+    zone: "South",
+    load: "198 kW",
+    voltage: "230 V",
+    status: "Active",
+  },
+  {
+    id: "MTR-1003",
+    zone: "East",
+    load: "310 kW",
+    voltage: "226 V",
+    status: "Warning",
+  },
+  {
+    id: "MTR-1004",
+    zone: "West",
+    load: "275 kW",
+    voltage: "229 V",
+    status: "Active",
+  },
+  {
+    id: "MTR-1005",
+    zone: "Central",
+    load: "342 kW",
+    voltage: "231 V",
+    status: "Critical",
+  },
+];
 
 export default function MeterTable() {
 
-  const badgeColor = (status) => {
+  const {
+    data,
+    loading,
+    error,
+  } = useApi(() => dashboardService.getMeters());
 
-    switch (status) {
+  const meters = data || dummyMeters;
 
-      case "Normal":
-        return "bg-green-500/10 text-green-400 border border-green-500/30";
+  if (loading) {
+    return (
+      <div className="bg-[#101827] border border-slate-800 rounded-2xl p-6 animate-pulse h-[420px]" />
+    );
+  }
 
-      case "High":
-        return "bg-yellow-500/10 text-yellow-400 border border-yellow-500/30";
-
-      case "Critical":
-        return "bg-red-500/10 text-red-400 border border-red-500/30";
-
-      default:
-        return "bg-slate-500/10 text-slate-300 border border-slate-600";
-    }
-
-  };
+  if (error) {
+    console.warn("Meter API unavailable. Showing dummy data.");
+  }
 
   return (
+    <div className="bg-[#101827] border border-slate-800 rounded-2xl p-6">
 
-    <section
-      className="
-      rounded-2xl
-      border
-      border-slate-800
-      bg-[#0B1220]
-      p-6
-      "
-    >
-
-      {/* Header */}
-
-      <div className="flex items-center justify-between mb-6">
-
-        <div>
-
-          <h2 className="text-xl font-semibold text-white">
-            Meter Monitoring
-          </h2>
-
-          <p className="text-sm text-slate-400 mt-1">
-            Live smart meter status across all zones
-          </p>
-
-        </div>
-
-        <button
-          className="
-          px-4
-          py-2
-          rounded-lg
-          bg-teal-700
-          hover:bg-teal-600
-          transition
-          text-sm
-          "
-        >
-          View All
-        </button>
-
-      </div>
-
-      {/* Table */}
+      <h2 className="text-xl font-semibold text-white mb-5">
+        Smart Meter Monitoring
+      </h2>
 
       <div className="overflow-x-auto">
 
@@ -73,35 +72,17 @@ export default function MeterTable() {
 
           <thead>
 
-            <tr className="border-b border-slate-800">
+            <tr className="border-b border-slate-700">
 
-              <th className="text-left py-4 text-sm text-slate-400 font-medium">
-                Meter ID
-              </th>
+              <th className="text-left py-3 text-slate-400">Meter ID</th>
 
-              <th className="text-left py-4 text-sm text-slate-400 font-medium">
-                Zone
-              </th>
+              <th className="text-left py-3 text-slate-400">Zone</th>
 
-              <th className="text-left py-4 text-sm text-slate-400 font-medium">
-                Current Load
-              </th>
+              <th className="text-left py-3 text-slate-400">Load</th>
 
-              <th className="text-left py-4 text-sm text-slate-400 font-medium">
-                Voltage
-              </th>
+              <th className="text-left py-3 text-slate-400">Voltage</th>
 
-              <th className="text-left py-4 text-sm text-slate-400 font-medium">
-                Frequency
-              </th>
-
-              <th className="text-left py-4 text-sm text-slate-400 font-medium">
-                Status
-              </th>
-
-              <th className="text-left py-4 text-sm text-slate-400 font-medium">
-                Updated
-              </th>
+              <th className="text-left py-3 text-slate-400">Status</th>
 
             </tr>
 
@@ -109,57 +90,44 @@ export default function MeterTable() {
 
           <tbody>
 
-            {meterData.map((meter) => (
+            {meters.map((meter, index) => (
 
               <tr
-                key={meter.id}
-                className="
-                border-b
-                border-slate-800/60
-                hover:bg-[#111827]
-                transition
-                "
+                key={index}
+                className="border-b border-slate-800 hover:bg-slate-800/40 transition"
               >
 
-                <td className="py-5 font-medium text-white">
+                <td className="py-4 text-white">
                   {meter.id}
                 </td>
 
-                <td className="text-slate-300">
+                <td className="py-4 text-slate-300">
                   {meter.zone}
                 </td>
 
-                <td className="text-teal-400 font-semibold">
+                <td className="py-4 text-slate-300">
                   {meter.load}
                 </td>
 
-                <td className="text-slate-300">
+                <td className="py-4 text-slate-300">
                   {meter.voltage}
                 </td>
 
-                <td className="text-slate-300">
-                  {meter.frequency}
-                </td>
-
-                <td>
+                <td className="py-4">
 
                   <span
-                    className={`
-                      px-3
-                      py-1
-                      rounded-full
-                      text-xs
-                      font-medium
-                      ${badgeColor(meter.status)}
-                    `}
+                    className={`px-3 py-1 rounded-full text-xs font-medium
+                    ${
+                      meter.status === "Active"
+                        ? "bg-green-500/20 text-green-400"
+                        : meter.status === "Warning"
+                        ? "bg-yellow-500/20 text-yellow-400"
+                        : "bg-red-500/20 text-red-400"
+                    }`}
                   >
                     {meter.status}
                   </span>
 
-                </td>
-
-                <td className="text-slate-400">
-                  {meter.updated}
                 </td>
 
               </tr>
@@ -172,7 +140,6 @@ export default function MeterTable() {
 
       </div>
 
-    </section>
-
+    </div>
   );
 }

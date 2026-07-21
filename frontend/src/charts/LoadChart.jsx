@@ -1,86 +1,66 @@
 import {
-  ResponsiveContainer,
   LineChart,
   Line,
-  CartesianGrid,
+  ResponsiveContainer,
   XAxis,
   YAxis,
   Tooltip,
+  CartesianGrid,
 } from "recharts";
 
-const loadData = [
-  { time: "00:00", load: 2.1 },
-  { time: "04:00", load: 2.5 },
-  { time: "08:00", load: 3.8 },
-  { time: "12:00", load: 4.5 },
-  { time: "16:00", load: 4.1 },
-  { time: "20:00", load: 3.4 },
-  { time: "24:00", load: 2.8 },
+import useApi from "../hooks/useApi";
+import energyService from "../services/energyService";
+
+const dummyData = [
+  { time: "10 AM", load: 210 },
+  { time: "11 AM", load: 240 },
+  { time: "12 PM", load: 280 },
+  { time: "1 PM", load: 260 },
+  { time: "2 PM", load: 310 },
+  { time: "3 PM", load: 295 },
 ];
 
 export default function LoadChart() {
+
+  const { data, loading, error } =
+    useApi(() => energyService.getLoadTrend());
+
+  const chartData = data || dummyData;
+
+  if (loading) {
+    return (
+      <div className="bg-[#101827] h-80 rounded-2xl animate-pulse" />
+    );
+  }
+
+  if (error) {
+    console.warn("Using dummy Load Chart data.");
+  }
+
   return (
-    <div className="bg-[#101827] border border-slate-800 rounded-2xl p-6 h-[380px]">
+    <div className="bg-[#101827] border border-slate-800 rounded-2xl p-6">
 
-      {/* Header */}
+      <h2 className="text-xl text-white font-semibold mb-5">
+        Energy Load Trend
+      </h2>
 
-      <div className="mb-6">
+      <ResponsiveContainer width="100%" height={250}>
 
-        <h2 className="text-xl font-semibold text-white">
-          Energy Load Trend
-        </h2>
+        <LineChart data={chartData}>
 
-        <p className="text-slate-400 text-sm mt-1">
-          24-hour electricity load monitoring
-        </p>
+          <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
 
-      </div>
+          <XAxis dataKey="time" stroke="#94A3B8" />
 
-      {/* Chart */}
+          <YAxis stroke="#94A3B8" />
 
-      <ResponsiveContainer width="100%" height="82%">
-
-        <LineChart data={loadData}>
-
-          <CartesianGrid
-            strokeDasharray="3 3"
-            stroke="#1E293B"
-          />
-
-          <XAxis
-            dataKey="time"
-            tick={{ fill: "#94A3B8", fontSize: 12 }}
-            axisLine={false}
-            tickLine={false}
-          />
-
-          <YAxis
-            tick={{ fill: "#94A3B8", fontSize: 12 }}
-            axisLine={false}
-            tickLine={false}
-          />
-
-          <Tooltip
-            contentStyle={{
-              background: "#0F172A",
-              border: "1px solid #334155",
-              borderRadius: "10px",
-              color: "#fff",
-            }}
-          />
+          <Tooltip />
 
           <Line
             type="monotone"
             dataKey="load"
             stroke="#14B8A6"
             strokeWidth={3}
-            dot={{
-              r: 5,
-              fill: "#14B8A6",
-            }}
-            activeDot={{
-              r: 7,
-            }}
           />
 
         </LineChart>

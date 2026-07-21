@@ -1,93 +1,53 @@
 import {
-  ResponsiveContainer,
   BarChart,
   Bar,
-  CartesianGrid,
+  ResponsiveContainer,
   XAxis,
   YAxis,
   Tooltip,
 } from "recharts";
 
-const consumptionData = [
-  {
-    sector: "Residential",
-    consumption: 420,
-  },
-  {
-    sector: "Industrial",
-    consumption: 690,
-  },
-  {
-    sector: "Commercial",
-    consumption: 510,
-  },
-  {
-    sector: "Agriculture",
-    consumption: 310,
-  },
+import useApi from "../hooks/useApi";
+import energyService from "../services/energyService";
+
+const dummyConsumption = [
+  { zone: "North", power: 420 },
+  { zone: "South", power: 350 },
+  { zone: "East", power: 310 },
+  { zone: "West", power: 390 },
 ];
 
 export default function ConsumptionBarChart() {
+
+  const { data } =
+    useApi(() => energyService.getConsumption());
+
+  const consumption = data || dummyConsumption;
+
   return (
-    <div className="bg-[#101827] border border-slate-800 rounded-2xl p-6 h-[380px]">
 
-      {/* Header */}
+    <div className="bg-[#101827] border border-slate-800 rounded-2xl p-6">
 
-      <div className="mb-6">
+      <h2 className="text-xl text-white font-semibold mb-5">
 
-        <h2 className="text-xl font-semibold text-white">
-          Power Consumption
-        </h2>
+        Zone Power Consumption
 
-        <p className="text-slate-400 text-sm mt-1">
-          Electricity consumption by sector
-        </p>
+      </h2>
 
-      </div>
+      <ResponsiveContainer width="100%" height={250}>
 
-      {/* Chart */}
+        <BarChart data={consumption}>
 
-      <ResponsiveContainer width="100%" height="82%">
+          <XAxis dataKey="zone"/>
 
-        <BarChart data={consumptionData}>
+          <YAxis/>
 
-          <CartesianGrid
-            strokeDasharray="3 3"
-            stroke="#1E293B"
-          />
-
-          <XAxis
-            dataKey="sector"
-            tick={{
-              fill: "#94A3B8",
-              fontSize: 12,
-            }}
-            axisLine={false}
-            tickLine={false}
-          />
-
-          <YAxis
-            tick={{
-              fill: "#94A3B8",
-              fontSize: 12,
-            }}
-            axisLine={false}
-            tickLine={false}
-          />
-
-          <Tooltip
-            contentStyle={{
-              background: "#0F172A",
-              border: "1px solid #334155",
-              borderRadius: "10px",
-              color: "#ffffff",
-            }}
-          />
+          <Tooltip/>
 
           <Bar
-            dataKey="consumption"
+            dataKey="power"
             fill="#14B8A6"
-            radius={[8, 8, 0, 0]}
+            radius={[8,8,0,0]}
           />
 
         </BarChart>
@@ -95,5 +55,6 @@ export default function ConsumptionBarChart() {
       </ResponsiveContainer>
 
     </div>
+
   );
 }

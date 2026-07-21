@@ -1,12 +1,19 @@
-import DashboardLayout from "../components/layout/DashboardLayout";
+import { useEffect } from "react";
 
+import DashboardLayout from "../components/layout/DashboardLayout";
 import DashboardCards from "../dashboard/DashboardCards";
 import ChartsSection from "../dashboard/ChartsSection";
 import MeterTable from "../dashboard/MeterTable";
 import AlertPanel from "../dashboard/AlertPanel";
 import RecentActivity from "../dashboard/RecentActivity";
+import api from "../services/api";
 
 export default function Dashboard() {
+
+  useEffect(() => {
+    console.log("API Base URL:", api.defaults.baseURL);
+  }, []);
+
   return (
     <DashboardLayout>
 

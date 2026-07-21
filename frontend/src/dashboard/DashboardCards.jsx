@@ -1,139 +1,103 @@
-import {
-  FaBolt,
-  FaChartLine,
-  FaBroadcastTower,
-  FaCheckCircle,
-} from "react-icons/fa";
+import { FaBolt, FaChartLine, FaExclamationTriangle, FaServer } from "react-icons/fa";
+import useApi from "../hooks/useApi";
+import dashboardService from "../services/dashboardService";
 
-const cards = [
+const dummyCards = [
   {
-    title: "Current Load",
-    value: "2.54 MW",
-    change: "+4.2%",
+    title: "Active Meters",
+    value: "2,548",
     icon: FaBolt,
     color: "text-teal-400",
-    bg: "bg-teal-500/10",
   },
   {
-    title: "Peak Load",
-    value: "3.91 MW",
-    change: "+1.8%",
+    title: "Grid Efficiency",
+    value: "97.8%",
     icon: FaChartLine,
-    color: "text-teal-400",
-    bg: "bg-teal-500/10",
-  },
-  {
-    title: "Active Zones",
-    value: "18",
-    change: "100%",
-    icon: FaBroadcastTower,
-    color: "text-teal-400",
-    bg: "bg-teal-500/10",
-  },
-  {
-    title: "Grid Health",
-    value: "98%",
-    change: "Healthy",
-    icon: FaCheckCircle,
     color: "text-green-400",
-    bg: "bg-green-500/10",
+  },
+  {
+    title: "Active Alerts",
+    value: "08",
+    icon: FaExclamationTriangle,
+    color: "text-red-400",
+  },
+  {
+    title: "Power Load",
+    value: "4.82 MW",
+    icon: FaServer,
+    color: "text-cyan-400",
   },
 ];
 
 export default function DashboardCards() {
-  return (
-    <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
 
-      {cards.map((card) => {
+  const {
+    data,
+    loading,
+    error,
+  } = useApi(() => dashboardService.getDashboardCards());
+
+  // Backend ready
+  const cards = data || dummyCards;
+
+  if (loading) {
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+        {dummyCards.map((_, index) => (
+          <div
+            key={index}
+            className="h-36 rounded-2xl bg-[#101827] border border-slate-800 animate-pulse"
+          />
+        ))}
+      </div>
+    );
+  }
+
+  if (error) {
+    console.warn("Dashboard API unavailable. Using dummy data.");
+  }
+
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+
+      {cards.map((card, index) => {
+
         const Icon = card.icon;
 
         return (
+
           <div
-            key={card.title}
-            className="
-              group
-              relative
-              overflow-hidden
-              rounded-2xl
-              border
-              border-slate-800
-              bg-[#0B1220]
-              p-6
-              transition-all
-              duration-300
-              hover:-translate-y-2
-              hover:border-teal-600
-              hover:shadow-xl
-              hover:shadow-teal-900/20
-            "
+            key={index}
+            className="bg-[#101827] border border-slate-800 rounded-2xl p-6"
           >
-            {/* Glow */}
 
-            <div
-              className="
-                absolute
-                -right-10
-                -top-10
-                h-28
-                w-28
-                rounded-full
-                bg-teal-500/5
-                blur-3xl
-                transition-all
-                duration-500
-                group-hover:bg-teal-500/15
-              "
-            />
-
-            {/* Header */}
-
-            <div className="flex items-center justify-between">
+            <div className="flex justify-between items-center">
 
               <div>
 
-                <p className="text-sm text-slate-400">
+                <p className="text-slate-400 text-sm">
                   {card.title}
                 </p>
 
-                <h2 className="mt-4 text-3xl font-bold text-white">
+                <h2 className="text-3xl font-bold text-white mt-2">
                   {card.value}
                 </h2>
 
               </div>
 
-              <div
-                className={`
-                  ${card.bg}
-                  h-14
-                  w-14
-                  rounded-xl
-                  flex
-                  items-center
-                  justify-center
-                `}
-              >
-                <Icon className={`text-2xl ${card.color}`} />
+              <div className={`text-3xl ${card.color}`}>
+
+                <Icon />
+
               </div>
 
             </div>
 
-            {/* Footer */}
-
-            <div className="mt-8 flex items-center justify-between">
-
-              <span className="text-sm text-slate-500">
-                Live Status
-              </span>
-
-              <span className={`text-sm font-semibold ${card.color}`}>
-                {card.change}
-              </span>
-
-            </div>
-
           </div>
+
         );
       })}
+
     </div>
   );
 }
