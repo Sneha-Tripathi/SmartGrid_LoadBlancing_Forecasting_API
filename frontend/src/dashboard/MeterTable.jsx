@@ -1,5 +1,7 @@
 import useApi from "../hooks/useApi";
 import dashboardService from "../services/dashboardService";
+import TableLoader from "../components/common/TableLoader";
+import EmptyState from "../components/common/EmptyState";
 
 const dummyMeters = [
   {
@@ -48,10 +50,25 @@ export default function MeterTable() {
     Array.isArray(data) && data.length > 0 ? data : dummyMeters;
 
   if (loading) {
-    return (
-      <div className="bg-[#101827] border border-slate-800 rounded-2xl p-6 animate-pulse h-[420px]" />
-    );
-  }
+
+  return <TableLoader />;
+
+}
+  if (!meters || meters.length === 0) {
+
+  return (
+
+    <EmptyState
+
+      title="No Meter Data"
+
+      message="No smart meter records found."
+
+    />
+
+  );
+
+}
 
   if (error) {
     console.warn("Meter API unavailable. Showing dummy data.");

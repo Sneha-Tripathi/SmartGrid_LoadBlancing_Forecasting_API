@@ -121,10 +121,11 @@ export default function Navbar() {
 
           {/* RIGHT */}
 
-          <ConnectionBadge />
+          
 
           <div className="flex items-center gap-3 shrink-0">
-
+            
+            <ConnectionBadge />
             <Button
               variant="outline"
               className="h-10 px-6 text-sm"

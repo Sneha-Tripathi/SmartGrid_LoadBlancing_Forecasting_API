@@ -1,20 +1,8 @@
 import useApi from "../hooks/useApi";
 import dashboardService from "../services/dashboardService";
 
-const dummyActivity = [
-  {
-    time: "09:45",
-    event: "Load Forecast Generated",
-  },
-  {
-    time: "09:30",
-    event: "New Meter Connected",
-  },
-  {
-    time: "09:12",
-    event: "Voltage Restored",
-  },
-];
+import EmptyState from "../components/common/EmptyState";
+import TableLoader from "../components/common/TableLoader";
 
 export default function RecentActivity() {
 
@@ -24,16 +12,26 @@ export default function RecentActivity() {
     error,
   } = useApi(() => dashboardService.getActivities());
 
-  const activities = data || dummyActivity;
+  const activities = data || [];
 
+  // Loading State
   if (loading) {
-    return (
-      <section className="rounded-2xl border border-slate-800 bg-[#0B1220] p-6 animate-pulse h-[260px]" />
-    );
+    return <TableLoader />;
   }
 
+  // Error State
   if (error) {
-    console.warn("Activity API unavailable.");
+    console.warn("Recent Activity API unavailable.");
+  }
+
+  // Empty State
+  if (!activities.length) {
+    return (
+      <EmptyState
+        title="No Recent Activity"
+        message="No recent activity found."
+      />
+    );
   }
 
   return (
@@ -57,7 +55,7 @@ export default function RecentActivity() {
           {activities.map((item, index) => (
 
             <div
-              key={index}
+              key={item.id ?? index}
               className="relative flex items-start gap-5"
             >
 

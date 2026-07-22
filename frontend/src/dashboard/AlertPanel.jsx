@@ -6,6 +6,7 @@ import {
 
 import useApi from "../hooks/useApi";
 import dashboardService from "../services/dashboardService";
+import EmptyState from "../components/common/EmptyState";
 
 const dummyAlerts = [
   {
@@ -42,6 +43,22 @@ export default function AlertPanel() {
       <div className="bg-[#101827] border border-slate-800 rounded-2xl p-6 animate-pulse h-[420px]" />
     );
   }
+
+  if (!alerts || alerts.length === 0) {
+
+  return (
+
+    <EmptyState
+
+      title="No Alerts"
+
+      message="Grid is operating normally."
+
+    />
+
+  );
+
+}
 
   if (error) {
     console.warn("Alert API unavailable. Using dummy alerts.");

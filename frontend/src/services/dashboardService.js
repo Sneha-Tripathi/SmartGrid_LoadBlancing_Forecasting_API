@@ -4,32 +4,57 @@ const dashboardService = {
 
   // Dashboard Cards
   async getDashboardCards() {
-    const response = await api.get("/dashboard/cards");
-    return response.data;
+    try {
+      const response = await api.get("/dashboard/cards");
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching dashboard cards:", error);
+      throw error;
+    }
   },
 
   // Forecast Data
   async getForecast() {
-    const response = await api.get("/forecast");
-    return response.data;
+    try {
+      const response = await api.get("/forecast");
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching forecast data:", error);
+      throw error;
+    }
   },
 
-  // Meter Table
+  // Smart Meter Data
   async getMeters() {
-    const response = await api.get("/meters");
-    return response.data;
+    try {
+      const response = await api.get("/meters");
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching meter data:", error);
+      throw error;
+    }
   },
 
   // Live Alerts
   async getAlerts() {
-    const response = await api.get("/alerts");
-    return response.data;
+    try {
+      const response = await api.get("/alerts");
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching alerts:", error);
+      throw error;
+    }
   },
 
   // Recent Activity
   async getActivities() {
-    const response = await api.get("/activity");
-    return response.data;
+    try {
+      const response = await api.get("/activity");
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching recent activity:", error);
+      throw error;
+    }
   },
 
 };

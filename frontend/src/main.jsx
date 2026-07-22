@@ -6,19 +6,16 @@ import App from "./App";
 import "./index.css";
 
 import { ApiProvider } from "./context/ApiContext";
+import { AuthProvider } from "./context/AuthContext";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-
     <BrowserRouter>
-
       <ApiProvider>
-
-        <App />
-
+        <AuthProvider>
+          <App />
+        </AuthProvider>
       </ApiProvider>
-
     </BrowserRouter>
-
   </React.StrictMode>
 );

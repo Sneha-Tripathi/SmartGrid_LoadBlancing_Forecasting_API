@@ -1,13 +1,21 @@
 export default function PageLoader() {
 
-    return (
+  return (
 
-        <div className="flex justify-center items-center h-64">
+    <div className="flex justify-center items-center min-h-[70vh]">
 
-            <div className="w-10 h-10 rounded-full border-4 border-teal-500 border-t-transparent animate-spin"></div>
+      <div className="flex flex-col items-center gap-6">
 
-        </div>
+        <div className="w-14 h-14 border-4 border-teal-500 border-t-transparent rounded-full animate-spin"></div>
 
-    );
+        <p className="text-slate-400 text-lg">
+          Loading Smart Grid Dashboard...
+        </p>
+
+      </div>
+
+    </div>
+
+  );
 
 }

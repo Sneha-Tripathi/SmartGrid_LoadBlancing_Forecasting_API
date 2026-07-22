@@ -11,27 +11,77 @@ import Login from "../pages/Login";
 import Signup from "../pages/Signup";
 import NotFound from "../pages/NotFound";
 
+import ProtectedRoute from "../components/auth/ProtectedRoute";
+
 export default function AppRoutes() {
   return (
     <Routes>
 
+      {/* Public Routes */}
+
       <Route path="/" element={<Home />} />
-
-      <Route path="/dashboard" element={<Dashboard />} />
-
-      <Route path="/monitoring" element={<Monitoring />} />
-
-      <Route path="/analytics" element={<Analytics />} />
-
-      <Route path="/reports" element={<Reports />} />
-
-      <Route path="/alerts" element={<Alerts />} />
-
-      <Route path="/settings" element={<Settings />} />
 
       <Route path="/login" element={<Login />} />
 
       <Route path="/signup" element={<Signup />} />
+
+      {/* Protected Routes */}
+
+      <Route
+        path="/dashboard"
+        element={
+          <ProtectedRoute>
+            <Dashboard />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/monitoring"
+        element={
+          <ProtectedRoute>
+            <Monitoring />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/analytics"
+        element={
+          <ProtectedRoute>
+            <Analytics />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/reports"
+        element={
+          <ProtectedRoute>
+            <Reports />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/alerts"
+        element={
+          <ProtectedRoute>
+            <Alerts />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/settings"
+        element={
+          <ProtectedRoute>
+            <Settings />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* 404 */}
 
       <Route path="*" element={<NotFound />} />
 

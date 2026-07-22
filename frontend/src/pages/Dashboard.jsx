@@ -8,6 +8,7 @@ import MeterTable from "../dashboard/MeterTable";
 import AlertPanel from "../dashboard/AlertPanel";
 import RecentActivity from "../dashboard/RecentActivity";
 import api from "../services/api";
+import RefreshButton from "../components/common/RefreshButton";
 
 export default function Dashboard() {
 
@@ -21,7 +22,6 @@ export default function Dashboard() {
       {/* Header */}
 
       <section className="mb-8">
-
         <div>
           <h1 className="text-3xl font-bold text-white">
           Smart Grid Dashboard
@@ -30,9 +30,16 @@ export default function Dashboard() {
         <p className="text-slate-400 mt-2">
           Real-time monitoring, AI forecasting and smart grid analytics.
         </p>
-        </div>
+        
+        <div className="mt-4">
           <ApiStatus />
+        </div>
+        </div>
+        <RefreshButton />
+          
       </section>
+
+
 
       {/* KPI Cards */}
 

@@ -1,13 +1,18 @@
-export default function ErrorMessage({ message }) {
+export default function ErrorMessage({
+  title = "Something went wrong",
+  message = "Unable to load data.",
+}) {
+  return (
+    <div className="bg-red-500/10 border border-red-500/30 rounded-2xl p-6">
 
-    return (
+      <h2 className="text-red-400 text-xl font-semibold">
+        {title}
+      </h2>
 
-        <div className="rounded-xl border border-red-500 bg-red-500/10 p-4 text-red-400">
+      <p className="text-slate-300 mt-2">
+        {message}
+      </p>
 
-            {message}
-
-        </div>
-
-    );
-
+    </div>
+  );
 }

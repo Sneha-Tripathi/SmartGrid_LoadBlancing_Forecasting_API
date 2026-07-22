@@ -7,6 +7,8 @@ import {
 
 import useApi from "../hooks/useApi";
 import dashboardService from "../services/dashboardService";
+import CardLoader from "../components/common/CardLoader";
+import EmptyState from "../components/common/EmptyState";
 
 const dummyCards = [
   {
@@ -73,18 +75,38 @@ export default function DashboardCards() {
     : dummyCards;
 
   if (loading) {
-    return (
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
-        {dummyCards.map((_, index) => (
-          <div
-            key={index}
-            className="h-36 rounded-2xl bg-[#101827] border border-slate-800 animate-pulse"
-          />
-        ))}
-      </div>
-    );
-  }
 
+  return (
+
+    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+
+      {[1,2,3,4].map((item) => (
+
+        <CardLoader key={item} />
+
+      ))}
+
+    </div>
+
+  );
+
+}
+
+  if (!cards || cards.length === 0) {
+
+  return (
+
+    <EmptyState
+
+      title="No Dashboard Data"
+
+      message="Dashboard statistics are unavailable."
+
+    />
+
+  );
+
+}
   if (error) {
     console.warn("Dashboard API unavailable. Using dummy data.");
   }
