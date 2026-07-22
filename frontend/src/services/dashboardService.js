@@ -2,15 +2,15 @@ import api from "./api";
 
 const dashboardService = {
 
-  // Dashboard Statistics
-  async getDashboardStats() {
-    const response = await api.get("/dashboard/stats");
-    return response.data;
-  },
-
   // Dashboard Cards
   async getDashboardCards() {
     const response = await api.get("/dashboard/cards");
+    return response.data;
+  },
+
+  // Forecast Data
+  async getForecast() {
+    const response = await api.get("/forecast");
     return response.data;
   },
 
@@ -28,7 +28,7 @@ const dashboardService = {
 
   // Recent Activity
   async getActivities() {
-    const response = await api.get("/activities");
+    const response = await api.get("/activity");
     return response.data;
   },
 

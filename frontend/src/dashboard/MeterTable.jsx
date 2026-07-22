@@ -40,14 +40,12 @@ const dummyMeters = [
 ];
 
 export default function MeterTable() {
+  const { data, loading, error } = useApi(() =>
+    dashboardService.getMeters()
+  );
 
-  const {
-    data,
-    loading,
-    error,
-  } = useApi(() => dashboardService.getMeters());
-
-  const meters = data || dummyMeters;
+  const meters =
+    Array.isArray(data) && data.length > 0 ? data : dummyMeters;
 
   if (loading) {
     return (
@@ -58,6 +56,24 @@ export default function MeterTable() {
   if (error) {
     console.warn("Meter API unavailable. Showing dummy data.");
   }
+
+  const getStatusStyle = (status) => {
+    switch (status) {
+      case "Active":
+      case "Normal":
+        return "bg-green-500/20 text-green-400";
+
+      case "Warning":
+      case "High":
+        return "bg-yellow-500/20 text-yellow-400";
+
+      case "Critical":
+        return "bg-red-500/20 text-red-400";
+
+      default:
+        return "bg-slate-500/20 text-slate-300";
+    }
+  };
 
   return (
     <div className="bg-[#101827] border border-slate-800 rounded-2xl p-6">
@@ -74,15 +90,25 @@ export default function MeterTable() {
 
             <tr className="border-b border-slate-700">
 
-              <th className="text-left py-3 text-slate-400">Meter ID</th>
+              <th className="text-left py-3 text-slate-400">
+                Meter ID
+              </th>
 
-              <th className="text-left py-3 text-slate-400">Zone</th>
+              <th className="text-left py-3 text-slate-400">
+                Zone
+              </th>
 
-              <th className="text-left py-3 text-slate-400">Load</th>
+              <th className="text-left py-3 text-slate-400">
+                Load
+              </th>
 
-              <th className="text-left py-3 text-slate-400">Voltage</th>
+              <th className="text-left py-3 text-slate-400">
+                Voltage
+              </th>
 
-              <th className="text-left py-3 text-slate-400">Status</th>
+              <th className="text-left py-3 text-slate-400">
+                Status
+              </th>
 
             </tr>
 
@@ -93,7 +119,7 @@ export default function MeterTable() {
             {meters.map((meter, index) => (
 
               <tr
-                key={index}
+                key={meter.id || index}
                 className="border-b border-slate-800 hover:bg-slate-800/40 transition"
               >
 
@@ -110,20 +136,15 @@ export default function MeterTable() {
                 </td>
 
                 <td className="py-4 text-slate-300">
-                  {meter.voltage}
+                  {meter.voltage ?? "--"}
                 </td>
 
                 <td className="py-4">
 
                   <span
-                    className={`px-3 py-1 rounded-full text-xs font-medium
-                    ${
-                      meter.status === "Active"
-                        ? "bg-green-500/20 text-green-400"
-                        : meter.status === "Warning"
-                        ? "bg-yellow-500/20 text-yellow-400"
-                        : "bg-red-500/20 text-red-400"
-                    }`}
+                    className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusStyle(
+                      meter.status
+                    )}`}
                   >
                     {meter.status}
                   </span>

@@ -22,7 +22,7 @@ const dummyAlerts = [
   },
   {
     id: 3,
-    type: "Info",
+    type: "Success",
     message: "Scheduled maintenance completed successfully.",
     time: "30 min ago",
   },
@@ -30,13 +30,12 @@ const dummyAlerts = [
 
 export default function AlertPanel() {
 
-  const {
-    data,
-    loading,
-    error,
-  } = useApi(() => dashboardService.getAlerts());
+  const { data, loading, error } = useApi(() =>
+    dashboardService.getAlerts()
+  );
 
-  const alerts = data || dummyAlerts;
+  const alerts =
+    Array.isArray(data) && data.length > 0 ? data : dummyAlerts;
 
   if (loading) {
     return (
@@ -48,6 +47,39 @@ export default function AlertPanel() {
     console.warn("Alert API unavailable. Using dummy alerts.");
   }
 
+  const getAlertStyle = (type) => {
+
+    switch (type) {
+
+      case "Critical":
+        return {
+          icon: <FaExclamationTriangle className="text-red-400" />,
+          border: "border-red-500",
+        };
+
+      case "Warning":
+      case "High":
+        return {
+          icon: <FaExclamationTriangle className="text-yellow-400" />,
+          border: "border-yellow-500",
+        };
+
+      case "Success":
+        return {
+          icon: <FaCheckCircle className="text-green-400" />,
+          border: "border-green-500",
+        };
+
+      default:
+        return {
+          icon: <FaInfoCircle className="text-blue-400" />,
+          border: "border-blue-500",
+        };
+
+    }
+
+  };
+
   return (
     <div className="bg-[#101827] border border-slate-800 rounded-2xl p-6 h-full">
 
@@ -57,50 +89,43 @@ export default function AlertPanel() {
 
       <div className="space-y-4">
 
-        {alerts.map((alert) => {
+        {alerts.map((alert, index) => {
 
-          let icon = <FaInfoCircle className="text-blue-400" />;
-          let border = "border-blue-500";
-
-          if (alert.type === "Critical") {
-            icon = <FaExclamationTriangle className="text-red-400" />;
-            border = "border-red-500";
-          }
-
-          if (alert.type === "Warning") {
-            icon = <FaExclamationTriangle className="text-yellow-400" />;
-            border = "border-yellow-500";
-          }
-
-          if (alert.type === "Success") {
-            icon = <FaCheckCircle className="text-green-400" />;
-            border = "border-green-500";
-          }
+          const { icon, border } = getAlertStyle(alert.type);
 
           return (
+
             <div
-              key={alert.id}
+              key={alert.id || index}
               className={`border-l-4 ${border} bg-slate-900 rounded-xl p-4`}
             >
 
               <div className="flex items-start gap-3">
 
                 <div className="text-xl mt-1">
+
                   {icon}
+
                 </div>
 
                 <div className="flex-1">
 
                   <h3 className="text-white font-medium">
+
                     {alert.type}
+
                   </h3>
 
                   <p className="text-slate-400 text-sm mt-1">
+
                     {alert.message}
+
                   </p>
 
                   <p className="text-xs text-slate-500 mt-2">
+
                     {alert.time}
+
                   </p>
 
                 </div>
@@ -108,7 +133,9 @@ export default function AlertPanel() {
               </div>
 
             </div>
+
           );
+
         })}
 
       </div>

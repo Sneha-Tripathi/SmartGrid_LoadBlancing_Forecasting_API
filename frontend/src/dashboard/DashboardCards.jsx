@@ -1,31 +1,37 @@
-import { FaBolt, FaChartLine, FaExclamationTriangle, FaServer } from "react-icons/fa";
+import {
+  FaBolt,
+  FaChartLine,
+  FaExclamationTriangle,
+  FaServer,
+} from "react-icons/fa";
+
 import useApi from "../hooks/useApi";
 import dashboardService from "../services/dashboardService";
 
 const dummyCards = [
   {
-    title: "Active Meters",
-    value: "2,548",
+    title: "Current Load",
+    value: "2.54 MW",
     icon: FaBolt,
     color: "text-teal-400",
   },
   {
-    title: "Grid Efficiency",
-    value: "97.8%",
-    icon: FaChartLine,
-    color: "text-green-400",
-  },
-  {
-    title: "Active Alerts",
-    value: "08",
-    icon: FaExclamationTriangle,
-    color: "text-red-400",
-  },
-  {
-    title: "Power Load",
-    value: "4.82 MW",
+    title: "Peak Load",
+    value: "3.91 MW",
     icon: FaServer,
     color: "text-cyan-400",
+  },
+  {
+    title: "Active Zones",
+    value: "18",
+    icon: FaExclamationTriangle,
+    color: "text-yellow-400",
+  },
+  {
+    title: "Grid Health",
+    value: "98%",
+    icon: FaChartLine,
+    color: "text-green-400",
   },
 ];
 
@@ -37,8 +43,34 @@ export default function DashboardCards() {
     error,
   } = useApi(() => dashboardService.getDashboardCards());
 
-  // Backend ready
-  const cards = data || dummyCards;
+  const cards = data
+    ? [
+        {
+          title: "Current Load",
+          value: data.current_load,
+          icon: FaBolt,
+          color: "text-teal-400",
+        },
+        {
+          title: "Peak Load",
+          value: data.peak_load,
+          icon: FaServer,
+          color: "text-cyan-400",
+        },
+        {
+          title: "Active Zones",
+          value: data.active_zones,
+          icon: FaExclamationTriangle,
+          color: "text-yellow-400",
+        },
+        {
+          title: "Grid Health",
+          value: data.grid_health,
+          icon: FaChartLine,
+          color: "text-green-400",
+        },
+      ]
+    : dummyCards;
 
   if (loading) {
     return (
@@ -68,10 +100,10 @@ export default function DashboardCards() {
 
           <div
             key={index}
-            className="bg-[#101827] border border-slate-800 rounded-2xl p-6"
+            className="bg-[#101827] border border-slate-800 rounded-2xl p-6 hover:border-teal-500 transition-all duration-300"
           >
 
-            <div className="flex justify-between items-center">
+            <div className="flex items-center justify-between">
 
               <div>
 
@@ -96,6 +128,7 @@ export default function DashboardCards() {
           </div>
 
         );
+
       })}
 
     </div>

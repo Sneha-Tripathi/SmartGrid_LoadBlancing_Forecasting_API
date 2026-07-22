@@ -11,15 +11,26 @@ const api = axios.create({
 
 // Request Interceptor
 
-api.interceptors.request.use(
-  (config) => {
-    console.log(
-      `API Request: ${config.method?.toUpperCase()} ${config.url}`
-    );
+api.interceptors.response.use(
+  (response) => response,
 
-    return config;
-  },
-  (error) => Promise.reject(error)
+  (error) => {
+
+    console.group("API ERROR");
+
+    console.log("URL :", error.config?.url);
+
+    console.log("Method :", error.config?.method);
+
+    console.log("Status :", error.response?.status);
+
+    console.log("Message :", error.message);
+
+    console.groupEnd();
+
+    return Promise.reject(error);
+
+  }
 );
 
 // Response Interceptor

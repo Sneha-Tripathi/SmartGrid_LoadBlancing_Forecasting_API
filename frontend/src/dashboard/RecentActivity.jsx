@@ -1,6 +1,40 @@
-import { activityData } from "../data/dashboardData";
+import useApi from "../hooks/useApi";
+import dashboardService from "../services/dashboardService";
+
+const dummyActivity = [
+  {
+    time: "09:45",
+    event: "Load Forecast Generated",
+  },
+  {
+    time: "09:30",
+    event: "New Meter Connected",
+  },
+  {
+    time: "09:12",
+    event: "Voltage Restored",
+  },
+];
 
 export default function RecentActivity() {
+
+  const {
+    data,
+    loading,
+    error,
+  } = useApi(() => dashboardService.getActivities());
+
+  const activities = data || dummyActivity;
+
+  if (loading) {
+    return (
+      <section className="rounded-2xl border border-slate-800 bg-[#0B1220] p-6 animate-pulse h-[260px]" />
+    );
+  }
+
+  if (error) {
+    console.warn("Activity API unavailable.");
+  }
 
   return (
 
@@ -20,10 +54,10 @@ export default function RecentActivity() {
 
         <div className="space-y-7">
 
-          {activityData.map((item) => (
+          {activities.map((item, index) => (
 
             <div
-              key={item.id}
+              key={index}
               className="relative flex items-start gap-5"
             >
 
@@ -36,7 +70,7 @@ export default function RecentActivity() {
                 </p>
 
                 <h3 className="text-white font-medium mt-1">
-                  {item.activity}
+                  {item.event}
                 </h3>
 
               </div>

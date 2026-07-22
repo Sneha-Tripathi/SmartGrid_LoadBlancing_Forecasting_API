@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 
+import ApiStatus from "../components/common/ApiStatus";
 import DashboardLayout from "../components/layout/DashboardLayout";
 import DashboardCards from "../dashboard/DashboardCards";
 import ChartsSection from "../dashboard/ChartsSection";
@@ -21,14 +22,16 @@ export default function Dashboard() {
 
       <section className="mb-8">
 
-        <h1 className="text-3xl font-bold text-white">
+        <div>
+          <h1 className="text-3xl font-bold text-white">
           Smart Grid Dashboard
         </h1>
 
         <p className="text-slate-400 mt-2">
           Real-time monitoring, AI forecasting and smart grid analytics.
         </p>
-
+        </div>
+          <ApiStatus />
       </section>
 
       {/* KPI Cards */}
