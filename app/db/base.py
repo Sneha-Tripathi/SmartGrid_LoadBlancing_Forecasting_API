@@ -6,4 +6,3 @@ class Base(DeclarativeBase):
 
 
 # Import all models here
-from app.models.smart_meter import SmartMeter
