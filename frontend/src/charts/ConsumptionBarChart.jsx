@@ -22,7 +22,9 @@ export default function ConsumptionBarChart() {
   const { data } =
     useApi(() => energyService.getConsumption());
 
-  const consumption = data || dummyConsumption;
+  const consumption = Array.isArray(data)
+  ? data
+  : dummyConsumption;
 
   return (
 

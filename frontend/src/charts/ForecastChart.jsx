@@ -23,7 +23,9 @@ export default function ForecastChart() {
   const { data } =
     useApi(() => energyService.getForecast());
 
-  const forecast = data || dummyForecast;
+  const forecast = Array.isArray(data)
+  ? data
+  : dummyForecast;
 
   return (
 

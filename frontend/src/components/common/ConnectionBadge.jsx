@@ -1,22 +1,24 @@
-import useHealthCheck from "../../hooks/useHealthCheck";
+import useWebSocket from "../../hooks/useWebSocket";
 
 export default function ConnectionBadge() {
 
-    const online = useHealthCheck();
+  const { connected } = useWebSocket();
 
-    return (
+  return (
 
-        <span
-            className={`px-3 py-1 rounded-full text-sm font-medium
-            ${
-                online
-                    ? "bg-green-500/20 text-green-400"
-                    : "bg-red-500/20 text-red-400"
-            }`}
-        >
-            {online ? "API Connected" : "API Disconnected"}
-        </span>
+    <div
+      className={`px-4 py-2 rounded-full text-sm font-medium
+      ${
+        connected
+          ? "bg-green-500/20 text-green-400"
+          : "bg-red-500/20 text-red-400"
+      }`}
+    >
 
-    );
+      {connected ? "🟢 Live" : "🔴 Offline"}
+
+    </div>
+
+  );
 
 }

@@ -5,130 +5,89 @@ import {
   FaServer,
 } from "react-icons/fa";
 
+import { useMemo } from "react";
+
 import useApi from "../hooks/useApi";
 import dashboardService from "../services/dashboardService";
-import CardLoader from "../components/common/CardLoader";
-import EmptyState from "../components/common/EmptyState";
-
-const dummyCards = [
-  {
-    title: "Current Load",
-    value: "2.54 MW",
-    icon: FaBolt,
-    color: "text-teal-400",
-  },
-  {
-    title: "Peak Load",
-    value: "3.91 MW",
-    icon: FaServer,
-    color: "text-cyan-400",
-  },
-  {
-    title: "Active Zones",
-    value: "18",
-    icon: FaExclamationTriangle,
-    color: "text-yellow-400",
-  },
-  {
-    title: "Grid Health",
-    value: "98%",
-    icon: FaChartLine,
-    color: "text-green-400",
-  },
-];
+import { useWebSocketContext } from "../context/WebSocketContext";
 
 export default function DashboardCards() {
-
-  const {
-    data,
-    loading,
-    error,
-  } = useApi(() => dashboardService.getDashboardCards());
-
-  const cards = data
-    ? [
-        {
-          title: "Current Load",
-          value: data.current_load,
-          icon: FaBolt,
-          color: "text-teal-400",
-        },
-        {
-          title: "Peak Load",
-          value: data.peak_load,
-          icon: FaServer,
-          color: "text-cyan-400",
-        },
-        {
-          title: "Active Zones",
-          value: data.active_zones,
-          icon: FaExclamationTriangle,
-          color: "text-yellow-400",
-        },
-        {
-          title: "Grid Health",
-          value: data.grid_health,
-          icon: FaChartLine,
-          color: "text-green-400",
-        },
-      ]
-    : dummyCards;
-
-  if (loading) {
-
-  return (
-
-    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
-
-      {[1,2,3,4].map((item) => (
-
-        <CardLoader key={item} />
-
-      ))}
-
-    </div>
-
+  // Initial API Data
+  const { data } = useApi(() =>
+    dashboardService.getDashboardCards()
   );
 
-}
+  // Live WebSocket Data
+  const { liveData } = useWebSocketContext();
 
-  if (!cards || cards.length === 0) {
+  const cards = useMemo(() => {
+    const source =
+      liveData ??
+      (data && typeof data === "object" ? data : null);
 
-  return (
+    if (!source) return [];
 
-    <EmptyState
+    return [
+      {
+        title: "Current Load",
+        value: String(source.current_load ?? "--"),
+        icon: FaBolt,
+        color: "text-cyan-400",
+        bg: "bg-cyan-500/10",
+      },
+      {
+        title: "Peak Load",
+        value: String(source.peak_load ?? "--"),
+        icon: FaServer,
+        color: "text-teal-400",
+        bg: "bg-teal-500/10",
+      },
+      {
+        title: "Active Zones",
+        value: source.active_zones ?? "--",
+        icon: FaChartLine,
+        color: "text-green-400",
+        bg: "bg-green-500/10",
+      },
+      {
+        title: "Grid Health",
+        value: `${source.grid_health ?? "--"}%`,
+        icon: FaExclamationTriangle,
+        color: "text-yellow-400",
+        bg: "bg-yellow-500/10",
+      },
+    ];
+  }, [data, liveData]);
 
-      title="No Dashboard Data"
-
-      message="Dashboard statistics are unavailable."
-
-    />
-
-  );
-
-}
-  if (error) {
-    console.warn("Dashboard API unavailable. Using dummy data.");
+  // Loading State
+  if (!cards.length) {
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+        {[1, 2, 3, 4].map((item) => (
+          <div
+            key={item}
+            className="h-36 rounded-2xl bg-[#101827] border border-slate-800 animate-pulse"
+          />
+        ))}
+      </div>
+    );
   }
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
-
       {cards.map((card, index) => {
-
         const Icon = card.icon;
 
         return (
-
           <div
             key={index}
-            className="bg-[#101827] border border-slate-800 rounded-2xl p-6 hover:border-teal-500 transition-all duration-300"
+            className="relative overflow-hidden bg-[#101827] border border-slate-800 rounded-2xl p-6 hover:border-cyan-500/40 transition-all duration-300"
           >
+            {/* Top Glow */}
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-cyan-500 to-teal-500" />
 
-            <div className="flex items-center justify-between">
-
+            <div className="flex justify-between items-center">
               <div>
-
                 <p className="text-slate-400 text-sm">
                   {card.title}
                 </p>
@@ -136,23 +95,17 @@ export default function DashboardCards() {
                 <h2 className="text-3xl font-bold text-white mt-2">
                   {card.value}
                 </h2>
-
               </div>
 
-              <div className={`text-3xl ${card.color}`}>
-
-                <Icon />
-
+              <div
+                className={`w-14 h-14 rounded-xl ${card.bg} flex items-center justify-center`}
+              >
+                <Icon className={`text-3xl ${card.color}`} />
               </div>
-
             </div>
-
           </div>
-
         );
-
       })}
-
     </div>
   );
 }

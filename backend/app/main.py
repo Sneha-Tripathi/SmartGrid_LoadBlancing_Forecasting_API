@@ -1,5 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi import WebSocket
+from app.websocket import websocket_endpoint
 
 app = FastAPI(
     title="Smart Grid Load Balancing API",
@@ -181,37 +183,99 @@ def alerts():
 def activity():
 
     return [
-
         {
-
             "time": "09:45",
-
             "event": "Load Forecast Generated"
-
         },
-
         {
-
             "time": "09:30",
-
             "event": "New Meter Connected"
-
         },
-
         {
-
             "time": "09:12",
-
             "event": "Voltage Restored"
-
         },
-
         {
-
             "time": "08:58",
-
             "event": "Critical Alert Resolved"
-
         }
+    ]
+
+
+# -------------------------------
+# WebSocket
+# -------------------------------
+
+@app.websocket("/ws")
+async def websocket_route(websocket: WebSocket):
+    await websocket_endpoint(websocket)
+
+# --------------------------------
+# Energy Load Trend
+# --------------------------------
+
+@app.get("/energy/load-trend")
+def load_trend():
+
+    return [
+
+        {"time": "10 AM", "load": 210},
+        {"time": "11 AM", "load": 240},
+        {"time": "12 PM", "load": 280},
+        {"time": "1 PM", "load": 260},
+        {"time": "2 PM", "load": 310},
+        {"time": "3 PM", "load": 295},
+
+    ]
+
+
+# --------------------------------
+# Forecast
+# --------------------------------
+
+@app.get("/energy/forecast")
+def forecast():
+
+    return [
+
+        {"day": "Mon", "value": 300},
+        {"day": "Tue", "value": 340},
+        {"day": "Wed", "value": 320},
+        {"day": "Thu", "value": 360},
+        {"day": "Fri", "value": 390},
+
+    ]
+
+
+# --------------------------------
+# Zone Distribution
+# --------------------------------
+
+@app.get("/energy/zones")
+def zones():
+
+    return [
+
+        {"name": "North", "value": 35},
+        {"name": "South", "value": 25},
+        {"name": "East", "value": 20},
+        {"name": "West", "value": 20},
+
+    ]
+
+
+# --------------------------------
+# Power Consumption
+# --------------------------------
+
+@app.get("/energy/consumption")
+def consumption():
+
+    return [
+
+        {"zone": "North", "power": 420},
+        {"zone": "South", "power": 350},
+        {"zone": "East", "power": 310},
+        {"zone": "West", "power": 390},
 
     ]

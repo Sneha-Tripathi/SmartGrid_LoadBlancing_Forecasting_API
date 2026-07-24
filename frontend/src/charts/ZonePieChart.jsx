@@ -28,7 +28,9 @@ export default function ZonePieChart() {
   const { data } =
     useApi(() => energyService.getZoneDistribution());
 
-  const zones = data || dummyZones;
+  const zones = Array.isArray(data)
+  ? data
+  : dummyZones;
 
   return (
 

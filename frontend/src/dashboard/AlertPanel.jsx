@@ -1,162 +1,120 @@
 import {
-  FaExclamationTriangle,
   FaCheckCircle,
+  FaExclamationTriangle,
   FaInfoCircle,
 } from "react-icons/fa";
 
-import useApi from "../hooks/useApi";
-import dashboardService from "../services/dashboardService";
-import EmptyState from "../components/common/EmptyState";
-
-const dummyAlerts = [
-  {
-    id: 1,
-    type: "Critical",
-    message: "Transformer overload detected in North Zone.",
-    time: "2 min ago",
-  },
-  {
-    id: 2,
-    type: "Warning",
-    message: "Voltage fluctuation detected in East Zone.",
-    time: "10 min ago",
-  },
-  {
-    id: 3,
-    type: "Success",
-    message: "Scheduled maintenance completed successfully.",
-    time: "30 min ago",
-  },
-];
+import { useEffect, useState } from "react";
+import { useWebSocketContext } from "../context/WebSocketContext";
 
 export default function AlertPanel() {
+  const { liveData } = useWebSocketContext();
 
-  const { data, loading, error } = useApi(() =>
-    dashboardService.getAlerts()
-  );
+  const [alerts, setAlerts] = useState([]);
 
-  const alerts =
-    Array.isArray(data) && data.length > 0 ? data : dummyAlerts;
+  useEffect(() => {
+    if (!liveData) return;
 
-  if (loading) {
-    return (
-      <div className="bg-[#101827] border border-slate-800 rounded-2xl p-6 animate-pulse h-[420px]" />
-    );
-  }
+    const message =
+      liveData.alert ||
+      (liveData.status === "Critical"
+        ? "Critical load detected."
+        : liveData.status === "Warning"
+        ? "Grid load approaching threshold."
+        : "Grid operating normally.");
 
-  if (!alerts || alerts.length === 0) {
+    const newAlert = {
+      id: Date.now(),
+      status: liveData.status,
+      message,
+      time: liveData.timestamp,
+    };
 
-  return (
+    setAlerts((prev) => [newAlert, ...prev].slice(0, 6));
+  }, [liveData]);
 
-    <EmptyState
-
-      title="No Alerts"
-
-      message="Grid is operating normally."
-
-    />
-
-  );
-
-}
-
-  if (error) {
-    console.warn("Alert API unavailable. Using dummy alerts.");
-  }
-
-  const getAlertStyle = (type) => {
-
-    switch (type) {
-
+  const getIcon = (status) => {
+    switch (status) {
       case "Critical":
-        return {
-          icon: <FaExclamationTriangle className="text-red-400" />,
-          border: "border-red-500",
-        };
+        return (
+          <FaExclamationTriangle className="text-red-400 text-xl" />
+        );
 
       case "Warning":
-      case "High":
-        return {
-          icon: <FaExclamationTriangle className="text-yellow-400" />,
-          border: "border-yellow-500",
-        };
+        return (
+          <FaExclamationTriangle className="text-yellow-400 text-xl" />
+        );
 
-      case "Success":
-        return {
-          icon: <FaCheckCircle className="text-green-400" />,
-          border: "border-green-500",
-        };
+      case "Normal":
+        return (
+          <FaCheckCircle className="text-green-400 text-xl" />
+        );
 
       default:
-        return {
-          icon: <FaInfoCircle className="text-blue-400" />,
-          border: "border-blue-500",
-        };
-
+        return (
+          <FaInfoCircle className="text-blue-400 text-xl" />
+        );
     }
+  };
 
+  const getBorder = (status) => {
+    switch (status) {
+      case "Critical":
+        return "border-red-500";
+
+      case "Warning":
+        return "border-yellow-500";
+
+      case "Normal":
+        return "border-green-500";
+
+      default:
+        return "border-blue-500";
+    }
   };
 
   return (
     <div className="bg-[#101827] border border-slate-800 rounded-2xl p-6 h-full">
-
       <h2 className="text-xl font-semibold text-white mb-6">
         Live Alerts
       </h2>
 
       <div className="space-y-4">
-
-        {alerts.map((alert, index) => {
-
-          const { icon, border } = getAlertStyle(alert.type);
-
-          return (
-
+        {alerts.length === 0 ? (
+          <div className="text-slate-400 text-center py-8">
+            Waiting for live alerts...
+          </div>
+        ) : (
+          alerts.map((alert) => (
             <div
-              key={alert.id || index}
-              className={`border-l-4 ${border} bg-slate-900 rounded-xl p-4`}
+              key={alert.id}
+              className={`border-l-4 ${getBorder(
+                alert.status
+              )} bg-slate-900 rounded-xl p-4`}
             >
-
               <div className="flex items-start gap-3">
-
-                <div className="text-xl mt-1">
-
-                  {icon}
-
-                </div>
+                {getIcon(alert.status)}
 
                 <div className="flex-1">
+                  <div className="flex justify-between">
+                    <h3 className="text-white font-semibold">
+                      {alert.status}
+                    </h3>
 
-                  <h3 className="text-white font-medium">
+                    <span className="text-xs text-slate-500">
+                      {alert.time}
+                    </span>
+                  </div>
 
-                    {alert.type}
-
-                  </h3>
-
-                  <p className="text-slate-400 text-sm mt-1">
-
+                  <p className="text-slate-300 text-sm mt-2">
                     {alert.message}
-
                   </p>
-
-                  <p className="text-xs text-slate-500 mt-2">
-
-                    {alert.time}
-
-                  </p>
-
                 </div>
-
               </div>
-
             </div>
-
-          );
-
-        })}
-
+          ))
+        )}
       </div>
-
     </div>
   );
 }

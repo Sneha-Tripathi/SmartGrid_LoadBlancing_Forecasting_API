@@ -25,7 +25,9 @@ export default function LoadChart() {
   const { data, loading, error } =
     useApi(() => energyService.getLoadTrend());
 
-  const chartData = data || dummyData;
+  const chartData = Array.isArray(data)
+  ? data
+  : dummyData;
 
   if (loading) {
     return (
