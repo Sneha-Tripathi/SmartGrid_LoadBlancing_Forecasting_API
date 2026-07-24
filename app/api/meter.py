@@ -1,3 +1,5 @@
+from typing import List
+
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 
@@ -29,3 +31,15 @@ def create_meter(
     db.refresh(new_meter)
 
     return new_meter
+
+
+@router.get(
+    "/",
+    response_model=List[SmartMeterResponse],
+    status_code=status.HTTP_200_OK
+)
+def get_all_meters(
+    db: Session = Depends(get_db)
+):
+    meters = db.query(SmartMeter).all()
+    return meters
