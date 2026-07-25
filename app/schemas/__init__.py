@@ -1,11 +1,17 @@
 from app.schemas.smart_meter import (
     SmartMeterCreate,
     SmartMeterResponse,
+    PaginationParams,
+    MeterFilterParams,
+    PaginatedResponse,
 )
 
 from app.schemas.user import (
-    UserCreate,
-    UserResponse,
-    LoginRequest,
+    ChangePasswordRequest,
+    DeactivateAccountRequest,
     Token,
+    UserCreate,
+    UserProfileResponse,
+    UserProfileUpdate,
+    UserResponse,
 )
