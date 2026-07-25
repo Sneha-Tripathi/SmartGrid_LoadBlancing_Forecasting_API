@@ -1,5 +1,4 @@
 import axios from "axios";
-import { retryRequest } from "../utils/retry";
 import toast from "react-hot-toast";
 
 const api = axios.create({
@@ -11,21 +10,6 @@ const api = axios.create({
   },
 });
 
-// Request Interceptor
-
-api.interceptors.response.use(
-  (response) => response,
-
-  (error) => {
-    toast.error(
-            error.response?.data?.message ||
-            "API Request Failed"
-        );
-    return Promise.reject(error);
-
-  }
-);
-
 // Response Interceptor
 
 api.interceptors.response.use(
@@ -35,11 +19,14 @@ api.interceptors.response.use(
     console.error("API Error:", error);
 
     if (error.response?.status === 401) {
-      console.warn("Unauthorized request");
-    }
-
-    if (error.response?.status === 500) {
-      console.warn("Internal server error");
+      toast.error("Unauthorized Request");
+    } else if (error.response?.status === 500) {
+      toast.error("Internal Server Error");
+    } else {
+      toast.error(
+        error.response?.data?.message ||
+        "API Request Failed"
+      );
     }
 
     return Promise.reject(error);

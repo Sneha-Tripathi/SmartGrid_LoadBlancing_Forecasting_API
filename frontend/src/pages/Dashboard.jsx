@@ -1,18 +1,18 @@
 import { useEffect } from "react";
 import useAuth from "../hooks/useAuth";
-
+import GridHealthPanel from "../dashboard/GridHealthPanel";
 import ApiStatus from "../components/common/ApiStatus";
 import RefreshButton from "../components/common/RefreshButton";
-
+import LiveStatistics from "../dashboard/LiveStatistics";
 import DashboardLayout from "../components/layout/DashboardLayout";
-
 import DashboardCards from "../dashboard/DashboardCards";
 import ChartsSection from "../dashboard/ChartsSection";
 import MeterTable from "../dashboard/MeterTable";
 import AlertPanel from "../dashboard/AlertPanel";
 import RecentActivity from "../dashboard/RecentActivity";
-
+import GridStatus from "../dashboard/GridStatus";
 import api from "../services/api";
+import NotificationCenter from "../dashboard/NotificationCenter";
 
 export default function Dashboard() {
 
@@ -59,6 +59,23 @@ export default function Dashboard() {
       {/* Dashboard Cards */}
 
       <DashboardCards />
+      
+
+      <section>
+        <GridStatus />
+      </section>
+
+      <section className="mt-8">
+
+        <LiveStatistics />
+
+      </section>
+
+      <section className="mt-8">
+
+        <GridHealthPanel />
+
+      </section>
 
       {/* Charts */}
 
@@ -96,6 +113,10 @@ export default function Dashboard() {
 
         <RecentActivity />
 
+      </section>
+
+      <section className="mt-8">
+        <NotificationCenter />
       </section>
 
     </DashboardLayout>
