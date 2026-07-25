@@ -10,7 +10,7 @@ Provides production-grade middleware components:
 """
 
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -69,11 +69,11 @@ class RequestTimingMiddleware(BaseHTTPMiddleware):
     """
 
     async def dispatch(self, request: Request, call_next):
-        start_time = datetime.now(timezone.utc)
+        start_time = datetime.now(UTC)
 
         response = await call_next(request)
 
-        end_time = datetime.now(timezone.utc)
+        end_time = datetime.now(UTC)
         execution_ms = (end_time - start_time).total_seconds() * 1000
 
         response.headers["X-Execution-Time-MS"] = str(round(execution_ms, 1))
@@ -118,7 +118,7 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
         response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
 
         # Conditional CSP: relaxed for docs, strict for API
-        if path in DOCS_PATHS or path.startswith("/docs") or path.startswith("/redoc"):
+        if path in DOCS_PATHS or path.startswith(("/docs", "/redoc")):
             # Relaxed CSP for Swagger/ReDoc CDN resources
             response.headers["Content-Security-Policy"] = (
                 "default-src 'self'; "
@@ -141,11 +141,7 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
             )
 
         # Cache control for API responses (not docs - they need caching)
-        if (
-            path not in DOCS_PATHS
-            and not path.startswith("/docs")
-            and not path.startswith("/redoc")
-        ):
+        if path not in DOCS_PATHS and not path.startswith(("/docs", "/redoc")):
             response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate"
 
         return response

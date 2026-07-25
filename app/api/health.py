@@ -5,7 +5,7 @@ Provides root status and health check endpoints.
 Uses application settings for dynamic metadata.
 """
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from fastapi import APIRouter, status
 from fastapi.responses import JSONResponse
@@ -61,6 +61,6 @@ def health_check():
             "status": "healthy",
             "service": settings.PROJECT_NAME,
             "version": settings.PROJECT_VERSION,
-            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "timestamp": datetime.now(UTC).isoformat(),
         },
     )

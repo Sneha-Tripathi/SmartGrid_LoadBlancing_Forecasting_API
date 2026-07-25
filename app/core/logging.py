@@ -11,7 +11,7 @@ Provides structured logging with:
 
 import logging
 import sys
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
 
@@ -40,7 +40,7 @@ class CustomFormatter(logging.Formatter):
     """Custom log formatter with UTC timestamps."""
 
     def formatTime(self, record, datefmt=None):
-        dt = datetime.fromtimestamp(record.created, tz=timezone.utc)
+        dt = datetime.fromtimestamp(record.created, tz=UTC)
         if datefmt:
             return dt.strftime(datefmt)
         return dt.strftime("%Y-%m-%d %H:%M:%S UTC")
@@ -196,14 +196,13 @@ class RequestLoggingMiddleware(BaseHTTPMiddleware):
 
         try:
             response: Response = await call_next(request)
-        except Exception as exc:
+        except Exception:
             # Log the exception with full traceback
             logger.exception(
-                "✗ [%s] %s %s failed: %s",
+                "✗ [%s] %s %s failed",
                 request_id,
                 request.method,
                 request.url.path,
-                str(exc),
             )
             raise
 

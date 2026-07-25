@@ -167,9 +167,8 @@ def get_prometheus_metrics() -> str:
 
     for endpoint, count in m["requests"]["by_endpoint"].items():
         method, path = endpoint.split(":", 1)
-        safe_path = path.replace("/", "_").replace("-", "_").strip("_") or "root"
         lines.append(
-            f'smartgrid_requests_by_endpoint{{method="{method}",' f'endpoint="{path}"}} {count}'
+            f'smartgrid_requests_by_endpoint{{method="{method}",endpoint="{path}"}} {count}'
         )
 
     lines.extend(
@@ -190,7 +189,7 @@ def get_prometheus_metrics() -> str:
         ]
     )
     lines.append(
-        f"smartgrid_average_response_time_ms " f'{m["performance"]["average_response_time_ms"]}'
+        f"smartgrid_average_response_time_ms {m['performance']['average_response_time_ms']}"
     )
 
     return "\n".join(lines)

@@ -5,7 +5,7 @@ Handles user registration, login, profile management,
 password changes, and account deactivation.
 """
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.security import OAuth2PasswordRequestForm
@@ -90,7 +90,7 @@ def register_user(
             detail="Email already exists",
         )
 
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
 
     db_user = User(
         username=user.username,
@@ -175,7 +175,7 @@ def login(
     rate_limiter.record_successful_login(username)
 
     # Update last login timestamp
-    user.last_login = datetime.now(timezone.utc)
+    user.last_login = datetime.now(UTC)
     db.commit()
 
     # Audit log for successful login
@@ -254,7 +254,7 @@ def update_profile(
     for field, value in update_fields.items():
         setattr(current_user, field, value)
 
-    current_user.updated_at = datetime.now(timezone.utc)
+    current_user.updated_at = datetime.now(UTC)
     db.commit()
     db.refresh(current_user)
 
@@ -289,7 +289,7 @@ def change_password(
         )
 
     current_user.hashed_password = hash_password(password_data.new_password)
-    current_user.updated_at = datetime.now(timezone.utc)
+    current_user.updated_at = datetime.now(UTC)
     db.commit()
 
     return {
@@ -326,7 +326,7 @@ def deactivate_account(
         )
 
     current_user.is_active = False
-    current_user.updated_at = datetime.now(timezone.utc)
+    current_user.updated_at = datetime.now(UTC)
     db.commit()
 
     return {

@@ -9,6 +9,7 @@ import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.pool import StaticPool
 
 from app.auth.security import create_access_token, hash_password
 from app.db.base import Base
@@ -17,11 +18,12 @@ from app.main import app
 from app.models.smart_meter import SmartMeter
 from app.models.user import User
 
-# Use an in-memory database for tests
-TEST_DATABASE_URL = "sqlite:///./test_smartgrid.db"
+# Use an in-memory database for tests (avoids file-locking races)
+TEST_DATABASE_URL = "sqlite:///:memory:"
 test_engine = create_engine(
     TEST_DATABASE_URL,
     connect_args={"check_same_thread": False},
+    poolclass=StaticPool,
 )
 TestSessionLocal = sessionmaker(
     autocommit=False,

@@ -49,7 +49,7 @@ class PasswordPolicy:
         """
         if len(password) < settings.PASSWORD_MIN_LENGTH:
             return False, (
-                f"Password must be at least {settings.PASSWORD_MIN_LENGTH} " f"characters long"
+                f"Password must be at least {settings.PASSWORD_MIN_LENGTH} characters long"
             )
 
         if settings.PASSWORD_REQUIRE_UPPERCASE and not re.search(r"[A-Z]", password):
@@ -66,7 +66,7 @@ class PasswordPolicy:
         ):
             return (
                 False,
-                "Password must contain at least one special character " r"(!@#$%^&*(),.?\":{}|<>)",
+                'Password must contain at least one special character (!@#$%^&*(),.?":{}|<>)',
             )
 
         return True, ""

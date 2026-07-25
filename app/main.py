@@ -11,6 +11,8 @@ Production-grade FastAPI application with:
 - Security audit logging
 """
 
+from datetime import UTC
+
 from fastapi import FastAPI, Request
 
 from app.api.router import api_router
@@ -117,8 +119,9 @@ def get_metrics(request: Request):
     try:
         meter_count = db.query(SmartMeter).count()
         user_count = db.query(User).count()
-        active_user_count = db.query(User).filter(User.is_active == True).count()
+        active_user_count = db.query(User).filter(User.is_active.is_(True)).count()
     except Exception:
+        logger.exception("Failed to query database for metrics")
         meter_count = 0
         user_count = 0
         active_user_count = 0
@@ -181,11 +184,11 @@ def liveness_probe():
 
     Returns a simple 200 OK if the application process is running.
     """
-    from datetime import datetime, timezone
+    from datetime import datetime
 
     return {
         "status": "alive",
-        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "timestamp": datetime.now(UTC).isoformat(),
     }
 
 
@@ -202,7 +205,7 @@ def readiness_probe():
     Checks database connectivity and returns 200 if the application
     is ready to accept traffic.
     """
-    from datetime import datetime, timezone
+    from datetime import datetime
 
     from sqlalchemy import text
 
@@ -214,6 +217,7 @@ def readiness_probe():
         db.execute(text("SELECT 1"))
         db.close()
     except Exception:
+        logger.exception("Database health check failed")
         db_status = "unhealthy"
 
     if db_status == "unhealthy":
@@ -230,7 +234,7 @@ def readiness_probe():
     return {
         "status": "ready",
         "database": db_status,
-        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "timestamp": datetime.now(UTC).isoformat(),
     }
 
 
