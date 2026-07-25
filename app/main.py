@@ -6,7 +6,9 @@ from app.core.exceptions import register_exception_handlers
 from app.db.base import Base
 from app.db.database import engine
 
+# Import models before create_all
 from app.models.smart_meter import SmartMeter
+from app.models.user import User
 
 Base.metadata.create_all(bind=engine)
 
