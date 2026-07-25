@@ -4,34 +4,35 @@ import crud
 
 
 @celery.task
-def calculate_load():
+def aggregate_zone_load():
 
     db = SessionLocal()
 
     try:
+
         meter = crud.get_latest_meter_data(db)
 
         if meter is None:
-            return {
-                "status": "No Data Found"
-            }
+            return "No Data Found"
 
-        apparent_power = meter.voltage * meter.current
+        zone = "Zone A"
 
-        power_factor = meter.power / apparent_power if apparent_power else 0
+        result = crud.create_aggregated_load(
+            db=db,
+            zone=zone,
+            avg_voltage=meter.voltage,
+            avg_current=meter.current,
+            avg_power=meter.power
+        )
 
-        result = {
-            "Voltage": meter.voltage,
-            "Current": meter.current,
-            "Power": meter.power,
-            "Frequency": meter.frequency,
-            "Apparent Power": round(apparent_power, 2),
-            "Power Factor": round(power_factor, 2)
+        print("Zone Aggregation Completed")
+
+        return {
+            "Zone": result.zone,
+            "Average Voltage": result.average_voltage,
+            "Average Current": result.average_current,
+            "Average Power": result.average_power
         }
-
-        print(result)
-
-        return result
 
     finally:
         db.close()

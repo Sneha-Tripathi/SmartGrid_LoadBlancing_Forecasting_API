@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from models import MeterData
+from models import MeterData, AggregatedLoad
 
 
 def create_meter_data(db: Session, data):
@@ -53,9 +53,32 @@ def delete_meter_data(db: Session, meter_id: int):
 
     return meter
 
+
 def get_latest_meter_data(db: Session):
     return (
         db.query(MeterData)
         .order_by(MeterData.id.desc())
         .first()
     )
+
+
+def create_aggregated_load(
+    db,
+    zone,
+    avg_voltage,
+    avg_current,
+    avg_power
+):
+
+    load = AggregatedLoad(
+        zone=zone,
+        average_voltage=avg_voltage,
+        average_current=avg_current,
+        average_power=avg_power
+    )
+
+    db.add(load)
+    db.commit()
+    db.refresh(load)
+
+    return load
