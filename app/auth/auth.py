@@ -12,11 +12,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
 from app.auth.dependencies import get_current_user
-from app.auth.security import (
-    create_access_token,
-    hash_password,
-    verify_password,
-)
+from app.auth.security import create_access_token, hash_password, verify_password
 from app.core.logging import log_audit
 from app.core.security import PasswordPolicy, rate_limiter
 from app.db.session import get_db

@@ -20,10 +20,7 @@ from app.core.config import settings
 from app.core.exceptions import register_exception_handlers
 from app.core.logging import configure_logging, get_logger
 from app.core.middleware import register_middleware
-from app.core.monitoring import (
-    get_prometheus_metrics,
-    metrics_collector,
-)
+from app.core.monitoring import get_prometheus_metrics, metrics_collector
 
 # Import models to ensure they are registered with SQLAlchemy
 from app.models.smart_meter import SmartMeter
