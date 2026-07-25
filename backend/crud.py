@@ -52,3 +52,10 @@ def delete_meter_data(db: Session, meter_id: int):
     db.commit()
 
     return meter
+
+def get_latest_meter_data(db: Session):
+    return (
+        db.query(MeterData)
+        .order_by(MeterData.id.desc())
+        .first()
+    )

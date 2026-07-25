@@ -1,14 +1,37 @@
 from celery_app import celery
-import time
+from database import SessionLocal
+import crud
 
 
 @celery.task
-def test_task():
-    print("Background Task Started...")
-    time.sleep(5)
-    print("Background Task Completed!")
+def calculate_load():
 
-    return {
-        "status": "success",
-        "message": "Background Task Executed Successfully"
-    }
+    db = SessionLocal()
+
+    try:
+        meter = crud.get_latest_meter_data(db)
+
+        if meter is None:
+            return {
+                "status": "No Data Found"
+            }
+
+        apparent_power = meter.voltage * meter.current
+
+        power_factor = meter.power / apparent_power if apparent_power else 0
+
+        result = {
+            "Voltage": meter.voltage,
+            "Current": meter.current,
+            "Power": meter.power,
+            "Frequency": meter.frequency,
+            "Apparent Power": round(apparent_power, 2),
+            "Power Factor": round(power_factor, 2)
+        }
+
+        print(result)
+
+        return result
+
+    finally:
+        db.close()
