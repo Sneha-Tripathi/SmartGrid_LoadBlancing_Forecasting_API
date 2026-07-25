@@ -38,8 +38,7 @@ def validate_meter_number(value: str) -> str:
 
     if not METER_NUMBER_PATTERN.match(value.strip()):
         raise ValueError(
-            "Invalid meter number format. "
-            "Expected format: MTR-YYYY-NNN (e.g., MTR-2024-001)"
+            "Invalid meter number format. " "Expected format: MTR-YYYY-NNN (e.g., MTR-2024-001)"
         )
     return value.strip()
 

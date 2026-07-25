@@ -115,9 +115,7 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
         response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
 
         # HSTS (HTTP Strict Transport Security)
-        response.headers["Strict-Transport-Security"] = (
-            "max-age=31536000; includeSubDomains"
-        )
+        response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
 
         # Conditional CSP: relaxed for docs, strict for API
         if path in DOCS_PATHS or path.startswith("/docs") or path.startswith("/redoc"):

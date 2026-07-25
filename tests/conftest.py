@@ -115,9 +115,7 @@ def admin_token(test_admin):
 @pytest.fixture(scope="function")
 def operator_token(test_operator):
     """Generate a JWT token for the operator user."""
-    return create_access_token(
-        {"sub": test_operator.username, "role": test_operator.role}
-    )
+    return create_access_token({"sub": test_operator.username, "role": test_operator.role})
 
 
 @pytest.fixture(scope="function")

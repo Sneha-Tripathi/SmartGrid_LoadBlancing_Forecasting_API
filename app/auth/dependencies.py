@@ -89,9 +89,7 @@ def require_role(required_role: str):
             "viewer": 1,
         }
 
-        if role_hierarchy.get(current_user.role, 0) < role_hierarchy.get(
-            required_role, 0
-        ):
+        if role_hierarchy.get(current_user.role, 0) < role_hierarchy.get(required_role, 0):
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail=(

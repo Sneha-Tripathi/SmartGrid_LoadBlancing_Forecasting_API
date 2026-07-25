@@ -244,9 +244,7 @@ def update_profile(
         )
 
     if "email" in update_fields and update_fields["email"] != current_user.email:
-        existing_email = (
-            db.query(User).filter(User.email == update_fields["email"]).first()
-        )
+        existing_email = db.query(User).filter(User.email == update_fields["email"]).first()
         if existing_email:
             raise HTTPException(
                 status_code=400,

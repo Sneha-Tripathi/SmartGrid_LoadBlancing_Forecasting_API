@@ -43,9 +43,7 @@ class TestSortingPerformance:
 
     def test_sort_by_zone(self, client, auth_header, sample_meter):
         """Test sorting by zone field."""
-        response = client.get(
-            "/meters/?sort_by=zone&sort_order=asc", headers=auth_header
-        )
+        response = client.get("/meters/?sort_by=zone&sort_order=asc", headers=auth_header)
         assert response.status_code == status.HTTP_200_OK
 
     def test_sort_by_multiple_combinations(self, client, auth_header, sample_meter):

@@ -45,9 +45,7 @@ class MetricsCollector:
         self._total_errors: int = 0
         self._total_response_time: float = 0.0
 
-    def record_request(
-        self, method: str, path: str, status_code: int, duration_ms: float
-    ) -> None:
+    def record_request(self, method: str, path: str, status_code: int, duration_ms: float) -> None:
         """Record a completed request."""
         self._total_requests += 1
         self._total_response_time += duration_ms
@@ -69,9 +67,7 @@ class MetricsCollector:
         """
         total_time = self._total_response_time
         avg_response_time = (
-            round(total_time / self._total_requests, 2)
-            if self._total_requests > 0
-            else 0.0
+            round(total_time / self._total_requests, 2) if self._total_requests > 0 else 0.0
         )
 
         return {
@@ -173,8 +169,7 @@ def get_prometheus_metrics() -> str:
         method, path = endpoint.split(":", 1)
         safe_path = path.replace("/", "_").replace("-", "_").strip("_") or "root"
         lines.append(
-            f'smartgrid_requests_by_endpoint{{method="{method}",'
-            f'endpoint="{path}"}} {count}'
+            f'smartgrid_requests_by_endpoint{{method="{method}",' f'endpoint="{path}"}} {count}'
         )
 
     lines.extend(
@@ -195,8 +190,7 @@ def get_prometheus_metrics() -> str:
         ]
     )
     lines.append(
-        f"smartgrid_average_response_time_ms "
-        f'{m["performance"]["average_response_time_ms"]}'
+        f"smartgrid_average_response_time_ms " f'{m["performance"]["average_response_time_ms"]}'
     )
 
     return "\n".join(lines)

@@ -54,9 +54,7 @@ class PaginationParams(BaseModel):
     """
 
     page: int = Field(default=1, ge=1, description="Page number (1-indexed)")
-    page_size: int = Field(
-        default=10, ge=1, le=100, description="Items per page (max 100)"
-    )
+    page_size: int = Field(default=10, ge=1, le=100, description="Items per page (max 100)")
 
 
 class MeterFilterParams(BaseModel):

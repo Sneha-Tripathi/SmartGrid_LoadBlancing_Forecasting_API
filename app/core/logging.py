@@ -53,9 +53,7 @@ class CustomFormatter(logging.Formatter):
 
 
 # Console formatter (human-readable, colored levels for dev)
-CONSOLE_FORMAT = CustomFormatter(
-    "%(asctime)s | %(levelname)-8s | %(name)s | %(message)s"
-)
+CONSOLE_FORMAT = CustomFormatter("%(asctime)s | %(levelname)-8s | %(name)s | %(message)s")
 
 # File formatter (detailed, structured)
 FILE_FORMAT = CustomFormatter(

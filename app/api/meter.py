@@ -83,9 +83,7 @@ def get_all_meters(
         query = query.filter(SmartMeter.zone.ilike(f"%{filters.zone}%"))
 
     if filters.consumer_name:
-        query = query.filter(
-            SmartMeter.consumer_name.ilike(f"%{filters.consumer_name}%")
-        )
+        query = query.filter(SmartMeter.consumer_name.ilike(f"%{filters.consumer_name}%"))
 
     if filters.meter_number:
         query = query.filter(SmartMeter.meter_number.ilike(f"%{filters.meter_number}%"))

@@ -109,9 +109,7 @@ class TestSearchEdgeCases:
 
     def test_search_no_results(self, client, auth_header):
         """Test search that returns no results."""
-        response = client.get(
-            "/meters/?search=NonExistentValueXYZ", headers=auth_header
-        )
+        response = client.get("/meters/?search=NonExistentValueXYZ", headers=auth_header)
         assert response.status_code == status.HTTP_200_OK
         data = response.json()
         assert data["total"] == 0
