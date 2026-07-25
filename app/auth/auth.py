@@ -74,11 +74,7 @@ def register_user(
             detail=error_msg,
         )
 
-    existing_user = (
-        db.query(User)
-        .filter(User.username == user.username)
-        .first()
-    )
+    existing_user = db.query(User).filter(User.username == user.username).first()
 
     if existing_user:
         raise HTTPException(
@@ -86,11 +82,7 @@ def register_user(
             detail="Username already exists",
         )
 
-    existing_email = (
-        db.query(User)
-        .filter(User.email == user.email)
-        .first()
-    )
+    existing_email = db.query(User).filter(User.email == user.email).first()
 
     if existing_email:
         raise HTTPException(
@@ -118,7 +110,7 @@ def register_user(
     log_audit(
         event="USER_REGISTERED",
         user=user.username,
-        details=f"Role: viewer",
+        details="Role: viewer",
     )
 
     return db_user
@@ -154,11 +146,7 @@ def login(
     # Check rate limit for login attempts per username
     rate_limiter.check_login_rate_limit(username, request)
 
-    user = (
-        db.query(User)
-        .filter(User.username == username)
-        .first()
-    )
+    user = db.query(User).filter(User.username == username).first()
 
     if not user:
         rate_limiter.record_failed_login(username)
@@ -197,9 +185,7 @@ def login(
         details=f"Role: {user.role}",
     )
 
-    access_token = create_access_token(
-        {"sub": user.username, "role": user.role}
-    )
+    access_token = create_access_token({"sub": user.username, "role": user.role})
 
     return {
         "access_token": access_token,
@@ -259,9 +245,7 @@ def update_profile(
 
     if "email" in update_fields and update_fields["email"] != current_user.email:
         existing_email = (
-            db.query(User)
-            .filter(User.email == update_fields["email"])
-            .first()
+            db.query(User).filter(User.email == update_fields["email"]).first()
         )
         if existing_email:
             raise HTTPException(

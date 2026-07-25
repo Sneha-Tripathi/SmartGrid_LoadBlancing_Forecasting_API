@@ -8,12 +8,10 @@ Uses an in-memory SQLite database for isolation.
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
-from sqlalchemy.orm import Session, sessionmaker
+from sqlalchemy.orm import sessionmaker
 
 from app.auth.security import create_access_token, hash_password
-from app.core.config import settings
 from app.db.base import Base
-from app.db.database import engine
 from app.db.session import get_db
 from app.main import app
 from app.models.smart_meter import SmartMeter

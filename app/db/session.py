@@ -4,7 +4,7 @@ Database Session Management
 Provides database session factory and dependency injection.
 """
 
-from typing import Generator
+from collections.abc import Generator
 
 from sqlalchemy.orm import Session, sessionmaker
 

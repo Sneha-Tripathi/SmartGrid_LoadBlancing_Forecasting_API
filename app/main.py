@@ -69,6 +69,7 @@ app.include_router(api_router)
 
 # ── Application Events ──────────────────────────
 
+
 @app.on_event("startup")
 async def startup_event():
     """Log application startup and initialize connections."""
@@ -101,6 +102,7 @@ async def shutdown_event():
 
 # ── Metrics Endpoint ────────────────────────────
 
+
 @app.get("/metrics", tags=["Metrics"])
 def get_metrics(request: Request):
     """
@@ -115,9 +117,7 @@ def get_metrics(request: Request):
     try:
         meter_count = db.query(SmartMeter).count()
         user_count = db.query(User).count()
-        active_user_count = (
-            db.query(User).filter(User.is_active == True).count()
-        )
+        active_user_count = db.query(User).filter(User.is_active == True).count()
     except Exception:
         meter_count = 0
         user_count = 0
@@ -149,6 +149,7 @@ def get_metrics(request: Request):
 
 # ── Prometheus Metrics Endpoint ─────────────────
 
+
 @app.get("/metrics/prometheus", tags=["Metrics"])
 def get_prometheus_endpoint():
     """
@@ -167,6 +168,7 @@ def get_prometheus_endpoint():
 
 # ── Liveness & Readiness Probes ─────────────────
 
+
 @app.get(
     "/health/live",
     tags=["Health"],
@@ -180,6 +182,7 @@ def liveness_probe():
     Returns a simple 200 OK if the application process is running.
     """
     from datetime import datetime, timezone
+
     return {
         "status": "alive",
         "timestamp": datetime.now(timezone.utc).isoformat(),
@@ -200,7 +203,9 @@ def readiness_probe():
     is ready to accept traffic.
     """
     from datetime import datetime, timezone
+
     from sqlalchemy import text
+
     from app.db.session import SessionLocal
 
     db_status = "healthy"
@@ -213,6 +218,7 @@ def readiness_probe():
 
     if db_status == "unhealthy":
         from fastapi.responses import JSONResponse
+
         return JSONResponse(
             status_code=503,
             content={
@@ -230,12 +236,14 @@ def readiness_probe():
 
 # ── Admin Reset Metrics Endpoint ────────────────
 
+
 @app.post("/metrics/reset", tags=["Metrics"])
 def reset_metrics(request: Request):
     """Reset all application metrics counters (admin only)."""
     auth_header = request.headers.get("Authorization", "")
     if not auth_header.startswith("Bearer "):
         from fastapi import HTTPException
+
         raise HTTPException(status_code=401, detail="Unauthorized")
 
     metrics_collector.reset()

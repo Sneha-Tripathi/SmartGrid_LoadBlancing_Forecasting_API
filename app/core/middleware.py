@@ -33,6 +33,7 @@ DOCS_PATHS = (
 #  DAY 17: Request ID Middleware
 # ══════════════════════════════════════════════
 
+
 class RequestIDMiddleware(BaseHTTPMiddleware):
     """
     Assigns a unique request ID to every request.
@@ -60,6 +61,7 @@ class RequestIDMiddleware(BaseHTTPMiddleware):
 #  DAY 17: Request Timing Middleware
 # ══════════════════════════════════════════════
 
+
 class RequestTimingMiddleware(BaseHTTPMiddleware):
     """
     Records the processing time for each request.
@@ -86,6 +88,7 @@ class RequestTimingMiddleware(BaseHTTPMiddleware):
 # ══════════════════════════════════════════════
 #  DAY 17: Security Headers Middleware
 # ══════════════════════════════════════════════
+
 
 class SecurityHeadersMiddleware(BaseHTTPMiddleware):
     """
@@ -140,7 +143,11 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
             )
 
         # Cache control for API responses (not docs - they need caching)
-        if path not in DOCS_PATHS and not path.startswith("/docs") and not path.startswith("/redoc"):
+        if (
+            path not in DOCS_PATHS
+            and not path.startswith("/docs")
+            and not path.startswith("/redoc")
+        ):
             response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate"
 
         return response
@@ -149,6 +156,7 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
 # ══════════════════════════════════════════════
 #  DAY 17: CORS Configuration
 # ══════════════════════════════════════════════
+
 
 def configure_cors(app: FastAPI):
     """
@@ -177,6 +185,7 @@ def configure_cors(app: FastAPI):
 # ══════════════════════════════════════════════
 #  DAY 17: Register All Middleware
 # ══════════════════════════════════════════════
+
 
 def register_middleware(app: FastAPI):
     """

@@ -6,8 +6,6 @@ Reads from environment variables and .env file.
 Supports multiple environments (development, staging, production).
 """
 
-from typing import List
-
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -20,9 +18,7 @@ class Settings(BaseSettings):
     # ── Project Info ────────────────────────────────
     PROJECT_NAME: str = "Smart Grid Load Balancing API"
     PROJECT_VERSION: str = "1.0.0"
-    PROJECT_DESCRIPTION: str = (
-        "Backend API for Smart Grid Load Balancing & Forecasting"
-    )
+    PROJECT_DESCRIPTION: str = "Backend API for Smart Grid Load Balancing & Forecasting"
 
     # ── Environment ─────────────────────────────────
     ENVIRONMENT: str = "development"
@@ -56,7 +52,7 @@ class Settings(BaseSettings):
     ACCOUNT_LOCKOUT_MINUTES: int = 15
 
     # ── CORS ────────────────────────────────────────
-    CORS_ORIGINS: List[str] = [
+    CORS_ORIGINS: list[str] = [
         "http://localhost:3000",
         "http://localhost:8000",
         "http://127.0.0.1:3000",

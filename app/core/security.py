@@ -13,7 +13,6 @@ Provides enterprise-grade security features:
 import re
 import time
 from collections import defaultdict
-from typing import Dict, Optional, Tuple
 
 from fastapi import HTTPException, Request, status
 
@@ -41,7 +40,7 @@ class PasswordPolicy:
     """
 
     @staticmethod
-    def validate(password: str) -> Tuple[bool, str]:
+    def validate(password: str) -> tuple[bool, str]:
         """
         Validate password against configured policy.
 
@@ -54,14 +53,10 @@ class PasswordPolicy:
                 f"characters long"
             )
 
-        if settings.PASSWORD_REQUIRE_UPPERCASE and not re.search(
-            r"[A-Z]", password
-        ):
+        if settings.PASSWORD_REQUIRE_UPPERCASE and not re.search(r"[A-Z]", password):
             return False, "Password must contain at least one uppercase letter"
 
-        if settings.PASSWORD_REQUIRE_LOWERCASE and not re.search(
-            r"[a-z]", password
-        ):
+        if settings.PASSWORD_REQUIRE_LOWERCASE and not re.search(r"[a-z]", password):
             return False, "Password must contain at least one lowercase letter"
 
         if settings.PASSWORD_REQUIRE_DIGIT and not re.search(r"\d", password):
@@ -93,9 +88,9 @@ class RateLimiter:
     """
 
     def __init__(self):
-        self._requests: Dict[str, list] = defaultdict(list)
-        self._login_attempts: Dict[str, list] = defaultdict(list)
-        self._locked_accounts: Dict[str, float] = {}
+        self._requests: dict[str, list] = defaultdict(list)
+        self._login_attempts: dict[str, list] = defaultdict(list)
+        self._locked_accounts: dict[str, float] = {}
 
     def check_rate_limit(self, request: Request) -> None:
         """
@@ -148,9 +143,7 @@ class RateLimiter:
         if username in self._locked_accounts:
             lockout_time = self._locked_accounts[username]
             if time.time() < lockout_time:
-                remaining_minutes = int(
-                    (lockout_time - time.time()) / 60
-                ) + 1
+                remaining_minutes = int((lockout_time - time.time()) / 60) + 1
                 raise HTTPException(
                     status_code=status.HTTP_429_TOO_MANY_REQUESTS,
                     detail=(
@@ -291,6 +284,3 @@ def validate_token_payload(payload: dict) -> bool:
 # ──────────────────────────────────────────────
 #  Rate Limiting Middleware
 # ──────────────────────────────────────────────
-
-
-

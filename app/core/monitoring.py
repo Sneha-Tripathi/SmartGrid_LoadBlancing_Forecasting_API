@@ -10,12 +10,10 @@ Provides Prometheus metrics for application monitoring:
 """
 
 import time
-from typing import Optional
 
-from fastapi import FastAPI, Request, Response
+from fastapi import Request, Response
 from starlette.middleware.base import BaseHTTPMiddleware
 
-from app.core.config import settings
 from app.core.logging import get_logger
 
 logger = get_logger(__name__)
@@ -56,16 +54,12 @@ class MetricsCollector:
 
         key = f"{method}:{path}"
         self._request_counts[key] = self._request_counts.get(key, 0) + 1
-        self._response_times[key] = (
-            self._response_times.get(key, 0) + duration_ms
-        )
+        self._response_times[key] = self._response_times.get(key, 0) + duration_ms
 
         if status_code >= 400:
             self._total_errors += 1
             error_key = f"{status_code}:{path}"
-            self._error_counts[error_key] = (
-                self._error_counts.get(error_key, 0) + 1
-            )
+            self._error_counts[error_key] = self._error_counts.get(error_key, 0) + 1
 
     def get_metrics(self) -> dict:
         """
@@ -94,9 +88,7 @@ class MetricsCollector:
             "errors": {
                 "total": self._total_errors,
                 "error_rate": (
-                    round(
-                        self._total_errors / self._total_requests * 100, 2
-                    )
+                    round(self._total_errors / self._total_requests * 100, 2)
                     if self._total_requests > 0
                     else 0.0
                 ),
@@ -175,9 +167,7 @@ def get_prometheus_metrics() -> str:
         "# HELP smartgrid_requests_total Total request count",
         "# TYPE smartgrid_requests_total counter",
     ]
-    lines.append(
-        f'smartgrid_requests_total {m["requests"]["total"]}'
-    )
+    lines.append(f'smartgrid_requests_total {m["requests"]["total"]}')
 
     for endpoint, count in m["requests"]["by_endpoint"].items():
         method, path = endpoint.split(":", 1)
@@ -187,25 +177,25 @@ def get_prometheus_metrics() -> str:
             f'endpoint="{path}"}} {count}'
         )
 
-    lines.extend([
-        "",
-        "# HELP smartgrid_errors_total Total error count",
-        "# TYPE smartgrid_errors_total counter",
-    ])
-    lines.append(
-        f'smartgrid_errors_total {m["errors"]["total"]}'
+    lines.extend(
+        [
+            "",
+            "# HELP smartgrid_errors_total Total error count",
+            "# TYPE smartgrid_errors_total counter",
+        ]
     )
-    lines.append(
-        f'smartgrid_error_rate {m["errors"]["error_rate"]}'
-    )
+    lines.append(f'smartgrid_errors_total {m["errors"]["total"]}')
+    lines.append(f'smartgrid_error_rate {m["errors"]["error_rate"]}')
 
-    lines.extend([
-        "",
-        "# HELP smartgrid_response_time_ms Response time in milliseconds",
-        "# TYPE smartgrid_response_time_ms gauge",
-    ])
+    lines.extend(
+        [
+            "",
+            "# HELP smartgrid_response_time_ms Response time in milliseconds",
+            "# TYPE smartgrid_response_time_ms gauge",
+        ]
+    )
     lines.append(
-        f'smartgrid_average_response_time_ms '
+        f"smartgrid_average_response_time_ms "
         f'{m["performance"]["average_response_time_ms"]}'
     )
 

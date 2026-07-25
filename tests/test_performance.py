@@ -22,16 +22,12 @@ class TestPaginationPerformance:
 
     def test_pagination_large_page_size(self, client, auth_header, sample_meter):
         """Test that large but valid page sizes work."""
-        response = client.get(
-            "/meters/?page=1&page_size=100", headers=auth_header
-        )
+        response = client.get("/meters/?page=1&page_size=100", headers=auth_header)
         assert response.status_code == status.HTTP_200_OK
 
     def test_pagination_multiple_pages(self, client, auth_header, sample_meter):
         """Test that page 2 returns empty when only 1 result exists."""
-        response = client.get(
-            "/meters/?page=2&page_size=10", headers=auth_header
-        )
+        response = client.get("/meters/?page=2&page_size=10", headers=auth_header)
         assert response.status_code == status.HTTP_200_OK
         data = response.json()
         assert data["total_pages"] >= 1
@@ -42,9 +38,7 @@ class TestSortingPerformance:
 
     def test_sort_ascending(self, client, auth_header, sample_meter):
         """Test ascending sort."""
-        response = client.get(
-            "/meters/?sort_by=id&sort_order=asc", headers=auth_header
-        )
+        response = client.get("/meters/?sort_by=id&sort_order=asc", headers=auth_header)
         assert response.status_code == status.HTTP_200_OK
 
     def test_sort_by_zone(self, client, auth_header, sample_meter):
@@ -69,9 +63,7 @@ class TestFilterPerformance:
 
     def test_filter_min_load(self, client, auth_header, sample_meter):
         """Test filtering by minimum load."""
-        response = client.get(
-            "/meters/?min_load=100", headers=auth_header
-        )
+        response = client.get("/meters/?min_load=100", headers=auth_header)
         assert response.status_code == status.HTTP_200_OK
         data = response.json()
         for item in data["items"]:
@@ -79,9 +71,7 @@ class TestFilterPerformance:
 
     def test_filter_max_load(self, client, auth_header, sample_meter):
         """Test filtering by maximum load."""
-        response = client.get(
-            "/meters/?max_load=200", headers=auth_header
-        )
+        response = client.get("/meters/?max_load=200", headers=auth_header)
         assert response.status_code == status.HTTP_200_OK
         data = response.json()
         for item in data["items"]:
@@ -89,9 +79,7 @@ class TestFilterPerformance:
 
     def test_filter_load_range(self, client, auth_header, sample_meter):
         """Test filtering by load range."""
-        response = client.get(
-            "/meters/?min_load=50&max_load=500", headers=auth_header
-        )
+        response = client.get("/meters/?min_load=50&max_load=500", headers=auth_header)
         assert response.status_code == status.HTTP_200_OK
         data = response.json()
         for item in data["items"]:
@@ -99,9 +87,7 @@ class TestFilterPerformance:
 
     def test_filter_by_meter_number(self, client, auth_header, sample_meter):
         """Test filtering by exact meter number."""
-        response = client.get(
-            f"/meters/?meter_number=MTR-2024-001", headers=auth_header
-        )
+        response = client.get("/meters/?meter_number=MTR-2024-001", headers=auth_header)
         assert response.status_code == status.HTTP_200_OK
         data = response.json()
         assert data["total"] >= 1

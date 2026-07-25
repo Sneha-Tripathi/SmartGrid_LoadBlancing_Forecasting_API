@@ -6,7 +6,6 @@ and role-based access control.
 """
 
 from datetime import datetime
-from typing import Optional
 
 from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator
 
@@ -23,7 +22,9 @@ class UserBase(BaseModel):
 class UserCreate(UserBase):
     """Schema for user registration."""
 
-    username: str = Field(..., min_length=3, max_length=50, description="Username (3-50 characters)")
+    username: str = Field(
+        ..., min_length=3, max_length=50, description="Username (3-50 characters)"
+    )
     password: str
 
     @field_validator("password")
@@ -32,9 +33,7 @@ class UserCreate(UserBase):
         """Ensure password meets minimum strength requirements."""
         min_length = settings.PASSWORD_MIN_LENGTH
         if len(value) < min_length:
-            raise ValueError(
-                f"Password must be at least {min_length} characters long"
-            )
+            raise ValueError(f"Password must be at least {min_length} characters long")
         return value
 
 
@@ -44,11 +43,11 @@ class UserResponse(UserBase):
     id: int
     is_active: bool
     role: str = "viewer"
-    full_name: Optional[str] = None
-    phone: Optional[str] = None
+    full_name: str | None = None
+    phone: str | None = None
     created_at: datetime
     updated_at: datetime
-    last_login: Optional[datetime] = None
+    last_login: datetime | None = None
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -61,11 +60,11 @@ class UserProfileResponse(BaseModel):
     email: str
     is_active: bool
     role: str
-    full_name: Optional[str] = None
-    phone: Optional[str] = None
+    full_name: str | None = None
+    phone: str | None = None
     created_at: datetime
     updated_at: datetime
-    last_login: Optional[datetime] = None
+    last_login: datetime | None = None
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -73,9 +72,9 @@ class UserProfileResponse(BaseModel):
 class UserProfileUpdate(BaseModel):
     """Schema for updating user profile (partial update)."""
 
-    full_name: Optional[str] = None
-    phone: Optional[str] = None
-    email: Optional[EmailStr] = None
+    full_name: str | None = None
+    phone: str | None = None
+    email: EmailStr | None = None
 
 
 class ChangePasswordRequest(BaseModel):

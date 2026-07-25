@@ -88,9 +88,7 @@ def get_all_meters(
         )
 
     if filters.meter_number:
-        query = query.filter(
-            SmartMeter.meter_number.ilike(f"%{filters.meter_number}%")
-        )
+        query = query.filter(SmartMeter.meter_number.ilike(f"%{filters.meter_number}%"))
 
     if filters.min_load is not None:
         query = query.filter(SmartMeter.current_load >= filters.min_load)
@@ -112,7 +110,11 @@ def get_all_meters(
 
     # Apply Sorting with validation
     allowed_sort_fields = [
-        "id", "meter_number", "zone", "consumer_name", "current_load",
+        "id",
+        "meter_number",
+        "zone",
+        "consumer_name",
+        "current_load",
     ]
     if filters.sort_by not in allowed_sort_fields:
         raise HTTPException(
@@ -180,11 +182,7 @@ def get_meter(
     """
     Retrieve a specific smart meter by its ID.
     """
-    meter = (
-        db.query(SmartMeter)
-        .filter(SmartMeter.id == meter_id)
-        .first()
-    )
+    meter = db.query(SmartMeter).filter(SmartMeter.id == meter_id).first()
 
     if meter is None:
         raise HTTPException(
@@ -217,11 +215,7 @@ def update_meter(
     Update an existing smart meter's data.
     Requires operator or admin role.
     """
-    meter = (
-        db.query(SmartMeter)
-        .filter(SmartMeter.id == meter_id)
-        .first()
-    )
+    meter = db.query(SmartMeter).filter(SmartMeter.id == meter_id).first()
 
     if meter is None:
         raise HTTPException(
@@ -261,11 +255,7 @@ def delete_meter(
     Delete a smart meter from the system.
     Requires admin role only.
     """
-    meter = (
-        db.query(SmartMeter)
-        .filter(SmartMeter.id == meter_id)
-        .first()
-    )
+    meter = db.query(SmartMeter).filter(SmartMeter.id == meter_id).first()
 
     if meter is None:
         raise HTTPException(

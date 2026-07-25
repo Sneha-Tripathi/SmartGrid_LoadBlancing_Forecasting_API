@@ -6,8 +6,6 @@ Pydantic models for Smart Meter CRUD operations with:
 - Pagination, filtering, sorting support (Day 15)
 """
 
-from typing import List, Optional
-
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from app.core.validation import (
@@ -35,7 +33,6 @@ class SmartMeterBase(BaseModel):
 
 class SmartMeterCreate(SmartMeterBase):
     """Schema for creating a new Smart Meter."""
-    pass
 
 
 class SmartMeterResponse(SmartMeterBase):
@@ -57,7 +54,9 @@ class PaginationParams(BaseModel):
     """
 
     page: int = Field(default=1, ge=1, description="Page number (1-indexed)")
-    page_size: int = Field(default=10, ge=1, le=100, description="Items per page (max 100)")
+    page_size: int = Field(
+        default=10, ge=1, le=100, description="Items per page (max 100)"
+    )
 
 
 class MeterFilterParams(BaseModel):
@@ -65,13 +64,16 @@ class MeterFilterParams(BaseModel):
     Query parameters for filtering, sorting, and searching meters.
     """
 
-    zone: Optional[str] = None
-    consumer_name: Optional[str] = None
-    meter_number: Optional[str] = None
-    min_load: Optional[float] = None
-    max_load: Optional[float] = None
-    search: Optional[str] = None
-    sort_by: str = Field(default="id", description="Sort field. Allowed: id, meter_number, zone, consumer_name, current_load")
+    zone: str | None = None
+    consumer_name: str | None = None
+    meter_number: str | None = None
+    min_load: float | None = None
+    max_load: float | None = None
+    search: str | None = None
+    sort_by: str = Field(
+        default="id",
+        description="Sort field. Allowed: id, meter_number, zone, consumer_name, current_load",
+    )
     sort_order: str = Field(default="asc", description="Sort order. Allowed: asc, desc")
 
 
@@ -80,7 +82,7 @@ class PaginatedResponse(BaseModel):
     Generic paginated response wrapper.
     """
 
-    items: List[SmartMeterResponse]
+    items: list[SmartMeterResponse]
     total: int
     page: int
     page_size: int

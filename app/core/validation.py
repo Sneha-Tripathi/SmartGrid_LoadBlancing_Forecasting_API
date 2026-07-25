@@ -8,10 +8,6 @@ Provides reusable Pydantic validators and enhanced validation utilities:
 """
 
 import re
-from typing import Optional
-
-from pydantic import field_validator
-
 
 # ──────────────────────────────────────────────
 #  Day 16: Reusable Validation Patterns
@@ -94,7 +90,7 @@ def validate_load_value(value: float) -> float:
     return round(value, 2)
 
 
-def validate_phone_number(value: Optional[str]) -> Optional[str]:
+def validate_phone_number(value: str | None) -> str | None:
     """
     Validate phone number format.
     Accepts formats: +1234567890, 123-456-7890, (123) 456-7890
@@ -108,9 +104,7 @@ def validate_phone_number(value: Optional[str]) -> Optional[str]:
     # Ensure cleaned number has valid length (10-15 digits)
     digit_count = sum(1 for c in cleaned if c.isdigit())
     if digit_count < 10 or digit_count > 15:
-        raise ValueError(
-            "Phone number must have between 10 and 15 digits"
-        )
+        raise ValueError("Phone number must have between 10 and 15 digits")
 
     return cleaned
 
@@ -118,6 +112,7 @@ def validate_phone_number(value: Optional[str]) -> Optional[str]:
 # ──────────────────────────────────────────────
 #  Day 16: Enhanced Error Response Builder
 # ──────────────────────────────────────────────
+
 
 def format_validation_errors(errors: list) -> list:
     """

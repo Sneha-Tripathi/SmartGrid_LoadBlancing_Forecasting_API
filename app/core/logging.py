@@ -10,16 +10,13 @@ Provides structured logging with:
 """
 
 import logging
-import os
 import sys
 from datetime import datetime, timezone
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
-from typing import Optional
 
 from fastapi import Request, Response
 from starlette.middleware.base import BaseHTTPMiddleware
-
 
 # ──────────────────────────────────────────────
 #  Log Directory Setup
@@ -37,6 +34,7 @@ AUDIT_LOG_FILE = LOG_DIR / "audit.log"
 # ──────────────────────────────────────────────
 #  Log Formatters
 # ──────────────────────────────────────────────
+
 
 class CustomFormatter(logging.Formatter):
     """Custom log formatter with UTC timestamps."""
@@ -65,14 +63,13 @@ FILE_FORMAT = CustomFormatter(
 )
 
 # Audit formatter (clean, with correlation ID)
-AUDIT_FORMAT = CustomFormatter(
-    "%(asctime)s | AUDIT | %(message)s"
-)
+AUDIT_FORMAT = CustomFormatter("%(asctime)s | AUDIT | %(message)s")
 
 
 # ──────────────────────────────────────────────
 #  Logger Configuration
 # ──────────────────────────────────────────────
+
 
 def get_logger(name: str) -> logging.Logger:
     """
@@ -149,11 +146,12 @@ def configure_logging():
 #  Audit Log Helper
 # ──────────────────────────────────────────────
 
+
 def log_audit(
     event: str,
-    user: Optional[str] = None,
-    resource: Optional[str] = None,
-    details: Optional[str] = None,
+    user: str | None = None,
+    resource: str | None = None,
+    details: str | None = None,
 ):
     """
     Log an audit event for security-sensitive operations.
@@ -178,6 +176,7 @@ def log_audit(
 # ══════════════════════════════════════════════
 #  DAY 14: Request Logging Middleware
 # ══════════════════════════════════════════════
+
 
 class RequestLoggingMiddleware(BaseHTTPMiddleware):
     """

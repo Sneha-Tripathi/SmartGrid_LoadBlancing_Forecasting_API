@@ -102,9 +102,7 @@ class TestGetMeters:
 
     def test_filter_by_zone(self, client, auth_header, sample_meter):
         """Test filtering meters by zone."""
-        response = client.get(
-            "/meters/?zone=North", headers=auth_header
-        )
+        response = client.get("/meters/?zone=North", headers=auth_header)
         assert response.status_code == status.HTTP_200_OK
         data = response.json()
         assert data["total"] >= 1
@@ -112,9 +110,7 @@ class TestGetMeters:
 
     def test_search_meters(self, client, auth_header, sample_meter):
         """Test searching meters."""
-        response = client.get(
-            "/meters/?search=John", headers=auth_header
-        )
+        response = client.get("/meters/?search=John", headers=auth_header)
         assert response.status_code == status.HTTP_200_OK
         data = response.json()
         assert data["total"] >= 1

@@ -5,8 +5,8 @@ Password hashing and JWT token creation utilities.
 Uses bcrypt for password hashing and JWT for token-based authentication.
 """
 
-from datetime import datetime, timedelta, UTC
-from typing import Any, Dict
+from datetime import UTC, datetime, timedelta
+from typing import Any
 
 from jose import jwt
 from passlib.context import CryptContext
@@ -29,7 +29,7 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
     return pwd_context.verify(plain_password, hashed_password)
 
 
-def create_access_token(data: Dict[str, Any]) -> str:
+def create_access_token(data: dict[str, Any]) -> str:
     """
     Create a JWT access token with expiration.
 
@@ -40,9 +40,7 @@ def create_access_token(data: Dict[str, Any]) -> str:
         Encoded JWT token string.
     """
     to_encode = data.copy()
-    expire = datetime.now(UTC) + timedelta(
-        minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES
-    )
+    expire = datetime.now(UTC) + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     to_encode.update({"exp": expire})
 
     encoded_jwt = jwt.encode(

@@ -9,8 +9,9 @@ import os
 import sys
 from logging.config import fileConfig
 
-from alembic import context
 from sqlalchemy import engine_from_config, pool
+
+from alembic import context
 
 # Add the project root to sys.path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -23,10 +24,10 @@ if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
 # Import all models so they are registered with Base.metadata
-from app.core.config import settings  # noqa: E402
-from app.db.base import Base  # noqa: E402
-from app.models.smart_meter import SmartMeter  # noqa: E402, F401
-from app.models.user import User  # noqa: E402, F401
+from app.core.config import settings
+from app.db.base import Base
+from app.models.smart_meter import SmartMeter  # noqa: F401
+from app.models.user import User  # noqa: F401
 
 # Override sqlalchemy.url from settings if available
 section = config.config_ini_section

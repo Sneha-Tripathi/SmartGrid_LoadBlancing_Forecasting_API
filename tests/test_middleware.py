@@ -20,9 +20,7 @@ class TestRequestIDMiddleware:
     def test_request_id_custom_value(self, client):
         """Test that a custom request ID from client is respected."""
         custom_id = "my-custom-request-id-123"
-        response = client.get(
-            "/health", headers={"X-Request-ID": custom_id}
-        )
+        response = client.get("/health", headers={"X-Request-ID": custom_id})
         assert response.status_code == status.HTTP_200_OK
         assert response.headers["X-Request-ID"] == custom_id
 

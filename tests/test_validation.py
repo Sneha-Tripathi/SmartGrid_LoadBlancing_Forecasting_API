@@ -83,9 +83,7 @@ class TestPaginationEdgeCases:
 
     def test_pagination_empty_result(self, client, auth_header):
         """Test pagination when no results match."""
-        response = client.get(
-            "/meters/?page=999&page_size=10", headers=auth_header
-        )
+        response = client.get("/meters/?page=999&page_size=10", headers=auth_header)
         assert response.status_code == status.HTTP_200_OK
         data = response.json()
         assert data["total"] == 0
@@ -97,16 +95,12 @@ class TestSortingEdgeCases:
 
     def test_sort_invalid_field(self, client, auth_header):
         """Test sorting with invalid field name."""
-        response = client.get(
-            "/meters/?sort_by=invalid_field", headers=auth_header
-        )
+        response = client.get("/meters/?sort_by=invalid_field", headers=auth_header)
         assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
     def test_sort_invalid_order(self, client, auth_header, sample_meter):
         """Test sorting with invalid sort order."""
-        response = client.get(
-            "/meters/?sort_order=invalid", headers=auth_header
-        )
+        response = client.get("/meters/?sort_order=invalid", headers=auth_header)
         assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
 
@@ -124,9 +118,7 @@ class TestSearchEdgeCases:
 
     def test_search_special_characters(self, client, auth_header, sample_meter):
         """Test search with special characters (should be safe)."""
-        response = client.get(
-            "/meters/?search=%25%24%23%40%21", headers=auth_header
-        )
+        response = client.get("/meters/?search=%25%24%23%40%21", headers=auth_header)
         assert response.status_code == status.HTTP_200_OK
 
 
