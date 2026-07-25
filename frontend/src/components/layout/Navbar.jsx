@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { NavLink } from "react-router-dom";
 import {
   FaBolt,
@@ -126,19 +127,20 @@ export default function Navbar() {
           <div className="flex items-center gap-3 shrink-0">
             
             <ConnectionBadge />
-            <Button
-              variant="outline"
-              className="h-10 px-6 text-sm"
+            <Link
+              to="/login"
+              className="px-5 py-2 rounded-lg border border-teal-500 text-white hover:bg-teal-600 transition"
             >
               Login
-            </Button>
+            </Link>
             
 
-            <Button
-              className="h-10 px-6 text-sm"
+            <Link
+              to="/signup"
+              className="px-5 py-2 rounded-lg bg-teal-600 hover:bg-teal-500 text-white transition"
             >
               Sign Up
-            </Button>
+            </Link>
 
           </div>
 

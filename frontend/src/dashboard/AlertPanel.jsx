@@ -74,7 +74,7 @@ export default function AlertPanel() {
   };
 
   return (
-    <div className="bg-[#101827] border border-slate-800 rounded-2xl p-6 h-full">
+    <div className="bg-[var(--card)] border border-slate-800 rounded-2xl p-6 h-full">
       <h2 className="text-xl font-semibold text-white mb-6">
         Live Alerts
       </h2>

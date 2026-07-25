@@ -1,5 +1,6 @@
 import axios from "axios";
 import { retryRequest } from "../utils/retry";
+import toast from "react-hot-toast";
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
@@ -16,19 +17,10 @@ api.interceptors.response.use(
   (response) => response,
 
   (error) => {
-
-    console.group("API ERROR");
-
-    console.log("URL :", error.config?.url);
-
-    console.log("Method :", error.config?.method);
-
-    console.log("Status :", error.response?.status);
-
-    console.log("Message :", error.message);
-
-    console.groupEnd();
-
+    toast.error(
+            error.response?.data?.message ||
+            "API Request Failed"
+        );
     return Promise.reject(error);
 
   }

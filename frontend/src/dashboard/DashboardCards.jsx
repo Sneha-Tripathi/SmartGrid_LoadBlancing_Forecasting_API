@@ -5,7 +5,6 @@ import {
   FaServer,
 } from "react-icons/fa";
 
-import { useMemo } from "react";
 
 import useApi from "../hooks/useApi";
 import dashboardService from "../services/dashboardService";
@@ -20,44 +19,53 @@ export default function DashboardCards() {
   // Live WebSocket Data
   const { liveData } = useWebSocketContext();
 
-  const cards = useMemo(() => {
-    const source =
-      liveData ??
-      (data && typeof data === "object" ? data : null);
+  const source =
+  liveData ||
+  (data && typeof data === "object" ? data : null);
 
-    if (!source) return [];
+if (!source) {
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+      {[1, 2, 3, 4].map((item) => (
+        <div
+          key={item}
+          className="bg-[#101827] border border-slate-800 rounded-2xl p-6 h-40 animate-pulse"
+        />
+      ))}
+    </div>
+  );
+}
 
-    return [
-      {
-        title: "Current Load",
-        value: String(source.current_load ?? "--"),
-        icon: FaBolt,
-        color: "text-cyan-400",
-        bg: "bg-cyan-500/10",
-      },
-      {
-        title: "Peak Load",
-        value: String(source.peak_load ?? "--"),
-        icon: FaServer,
-        color: "text-teal-400",
-        bg: "bg-teal-500/10",
-      },
-      {
-        title: "Active Zones",
-        value: source.active_zones ?? "--",
-        icon: FaChartLine,
-        color: "text-green-400",
-        bg: "bg-green-500/10",
-      },
-      {
-        title: "Grid Health",
-        value: `${source.grid_health ?? "--"}%`,
-        icon: FaExclamationTriangle,
-        color: "text-yellow-400",
-        bg: "bg-yellow-500/10",
-      },
-    ];
-  }, [data, liveData]);
+const cards = [
+  {
+    title: "Current Load",
+    value: `${source.current_load} MW`,
+    icon: FaBolt,
+    color: "text-cyan-400",
+    bg: "bg-cyan-500/10",
+  },
+  {
+    title: "Peak Load",
+    value: `${source.peak_load} MW`,
+    icon: FaServer,
+    color: "text-teal-400",
+    bg: "bg-teal-500/10",
+  },
+  {
+    title: "Active Zones",
+    value: source.active_zones,
+    icon: FaChartLine,
+    color: "text-green-400",
+    bg: "bg-green-500/10",
+  },
+  {
+    title: "Grid Health",
+    value: `${source.grid_health}%`,
+    icon: FaExclamationTriangle,
+    color: "text-yellow-400",
+    bg: "bg-yellow-500/10",
+  },
+];
 
   // Loading State
   if (!cards.length) {
@@ -66,13 +74,15 @@ export default function DashboardCards() {
         {[1, 2, 3, 4].map((item) => (
           <div
             key={item}
-            className="h-36 rounded-2xl bg-[#101827] border border-slate-800 animate-pulse"
+            className="bg-[var(--card)] border border-slate-800 rounded-2xl p-6"
           />
         ))}
       </div>
     );
   }
-
+  console.log("API DATA:", data);
+console.log("LIVE DATA:", liveData);
+console.log("USING:", liveData ?? data);
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
       {cards.map((card, index) => {

@@ -1,6 +1,26 @@
-import { FaBell, FaSearch } from "react-icons/fa";
+import {
+  FaBell,
+  FaSearch,
+  FaSignOutAlt,
+} from "react-icons/fa";
+
+import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
+import useAuth from "../../hooks/useAuth";
 
 export default function DashboardNavbar() {
+  const navigate = useNavigate();
+
+  const { user, logout } = useAuth();
+
+  const handleLogout = () => {
+    logout();
+
+    toast.success("Logged Out Successfully");
+
+    navigate("/login");
+  };
+
   return (
     <header
       className="
@@ -19,7 +39,6 @@ export default function DashboardNavbar() {
         {/* Left */}
 
         <div>
-
           <h1 className="text-3xl font-bold text-white">
             Dashboard
           </h1>
@@ -27,7 +46,6 @@ export default function DashboardNavbar() {
           <p className="text-sm text-slate-400 mt-1">
             Smart Grid Load Monitoring
           </p>
-
         </div>
 
         {/* Right */}
@@ -62,6 +80,7 @@ export default function DashboardNavbar() {
               pl-11
               pr-4
               text-sm
+              text-white
               outline-none
               focus:border-teal-600
               "
@@ -84,6 +103,7 @@ export default function DashboardNavbar() {
             justify-center
             hover:border-teal-600
             duration-300
+            text-white
             "
           >
             <FaBell />
@@ -93,42 +113,67 @@ export default function DashboardNavbar() {
 
           <div className="flex items-center gap-3">
 
-           
+            {/* Avatar */}
 
-            <div className="flex items-center gap-3">
-              
-  <div
-    className="
-      w-12
-      h-12
-      rounded-full
-      bg-teal-600
-      flex
-      items-center
-      justify-center
-      text-white
-      font-bold
-      text-lg
-      shadow-lg
-      shadow-teal-700/20
-    "
-  >
-    S
-  </div>
+            <div
+              className="
+              w-12
+              h-12
+              rounded-full
+              bg-teal-600
+              flex
+              items-center
+              justify-center
+              text-white
+              font-bold
+              text-lg
+              shadow-lg
+              shadow-teal-700/20
+              "
+            >
+              {user?.name
+                ? user.name.charAt(0).toUpperCase()
+                : "G"}
+            </div>
 
-  <div>
+            {/* User Info */}
 
-    <h4 className="text-white font-semibold">
-      Sneha
-    </h4>
+            <div>
 
-    <p className="text-slate-400 text-sm">
-      Frontend Developer
-    </p>
+              <h4 className="text-white font-semibold">
+                {user?.name || "Guest"}
+              </h4>
 
-  </div>
+              <p className="text-slate-400 text-sm">
+                {user?.email || "guest@example.com"}
+              </p>
 
-</div>
+            </div>
+
+            {/* Logout */}
+
+            <button
+              onClick={handleLogout}
+              className="
+              ml-3
+              w-11
+              h-11
+              rounded-xl
+              bg-red-500/10
+              border
+              border-red-500/30
+              flex
+              items-center
+              justify-center
+              text-red-400
+              hover:bg-red-500
+              hover:text-white
+              duration-300
+              "
+              title="Logout"
+            >
+              <FaSignOutAlt />
+            </button>
 
           </div>
 

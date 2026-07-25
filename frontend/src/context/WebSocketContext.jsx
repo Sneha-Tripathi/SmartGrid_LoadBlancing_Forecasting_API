@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
+import toast from "react-hot-toast";
 import websocket from "../services/websocket";
 
 const WebSocketContext = createContext();
@@ -9,15 +10,45 @@ export function WebSocketProvider({ children }) {
 
   useEffect(() => {
     websocket.connect(
+      // Message Received
       (data) => {
         setLiveData(data);
       },
-      () => setConnected(true),
-      () => setConnected(false),
-      () => setConnected(false)
+
+      // Connected
+      () => {
+        console.log("✅ WebSocket Connected");
+        setConnected(true);
+
+        toast.success("Connected to Live Server", {
+          id: "ws-connected",
+        });
+      },
+
+      // Closed
+      () => {
+        console.log("❌ WebSocket Disconnected");
+        setConnected(false);
+
+        toast.error("Disconnected from Live Server", {
+          id: "ws-disconnected",
+        });
+      },
+
+      // Error
+      () => {
+        console.log("⚠️ WebSocket Error");
+        setConnected(false);
+
+        toast.error("WebSocket Connection Error", {
+          id: "ws-error",
+        });
+      }
     );
 
-    //return () => websocket.disconnect();
+    return () => {
+      websocket.disconnect();
+    };
   }, []);
 
   return (

@@ -27,3 +27,15 @@
         padding-right:18px;
     }
 }
+
+:root[data-theme="dark"]{
+  --bg:#050816;
+  --card:#101827;
+  --text:#ffffff;
+}
+
+:root[data-theme="light"]{
+  --bg:#f8fafc;
+  --card:#ffffff;
+  --text:#0f172a;
+}

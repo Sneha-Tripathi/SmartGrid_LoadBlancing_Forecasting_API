@@ -1,55 +1,74 @@
 import { useEffect } from "react";
+import useAuth from "../hooks/useAuth";
 
 import ApiStatus from "../components/common/ApiStatus";
+import RefreshButton from "../components/common/RefreshButton";
+
 import DashboardLayout from "../components/layout/DashboardLayout";
+
 import DashboardCards from "../dashboard/DashboardCards";
 import ChartsSection from "../dashboard/ChartsSection";
 import MeterTable from "../dashboard/MeterTable";
 import AlertPanel from "../dashboard/AlertPanel";
 import RecentActivity from "../dashboard/RecentActivity";
+
 import api from "../services/api";
-import RefreshButton from "../components/common/RefreshButton";
 
 export default function Dashboard() {
+
+  const { user } = useAuth();
 
   useEffect(() => {
     console.log("API Base URL:", api.defaults.baseURL);
   }, []);
 
   return (
+  <div className="bg-[var(--bg)] min-h-screen">
     <DashboardLayout>
 
-      {/* Header */}
+      {/* Welcome Section */}
 
-      <section className="mb-8">
+      <section className="mb-8 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+
         <div>
-          <h1 className="text-3xl font-bold text-white">
-          Smart Grid Dashboard
-        </h1>
 
-        <p className="text-slate-400 mt-2">
-          Real-time monitoring, AI forecasting and smart grid analytics.
-        </p>
-        
-        <div className="mt-4">
-          <ApiStatus />
+          <h1 className="text-3xl font-bold text-white">
+            Welcome, {user?.name || "User"} 👋
+          </h1>
+
+          <p className="text-slate-400 mt-2">
+            Smart Grid Monitoring Dashboard
+          </p>
+
+          <p className="text-sm text-teal-400 mt-1">
+            {user?.role || "Frontend Developer"}
+          </p>
+
+          <div className="mt-5">
+            <ApiStatus />
+          </div>
+
         </div>
+
+        <div>
+          <RefreshButton />
         </div>
-        <RefreshButton />
-          
+
       </section>
 
-
-
-      {/* KPI Cards */}
+      {/* Dashboard Cards */}
 
       <DashboardCards />
 
       {/* Charts */}
 
-      <ChartsSection />
+      <section className="mt-8">
 
-      {/* Table + Alerts */}
+        <ChartsSection />
+
+      </section>
+
+      {/* Meter Table + Live Alerts */}
 
       <section className="mt-8">
 
@@ -61,13 +80,17 @@ export default function Dashboard() {
 
           </div>
 
-          <AlertPanel />
+          <div>
+
+            <AlertPanel />
+
+          </div>
 
         </div>
 
       </section>
 
-      {/* Activity */}
+      {/* Recent Activity */}
 
       <section className="mt-8">
 
@@ -76,5 +99,10 @@ export default function Dashboard() {
       </section>
 
     </DashboardLayout>
+  
+  </div>
+    
+
   );
+
 }
