@@ -1,5 +1,20 @@
 from sqlalchemy.orm import Session
 from models import MeterData, AggregatedLoad
+from models import Alert
+
+
+def create_alert(db, zone, load, status):
+    alert = Alert(
+        zone=zone,
+        load=load,
+        status=status
+    )
+
+    db.add(alert)
+    db.commit()
+    db.refresh(alert)
+
+    return alert
 
 
 def create_meter_data(db: Session, data):
@@ -82,3 +97,16 @@ def create_aggregated_load(
     db.refresh(load)
 
     return load
+
+def create_alert(db, zone, load, status):
+    alert = Alert(
+        zone=zone,
+        load=load,
+        status=status
+    )
+
+    db.add(alert)
+    db.commit()
+    db.refresh(alert)
+
+    return alert
