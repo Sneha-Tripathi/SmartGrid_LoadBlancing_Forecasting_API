@@ -1,6 +1,31 @@
 import api from "./api";
 
 const analyticsService = {
+  async getForecastHourly() {
+    const response = await api.get("/analytics/forecast/hourly");
+    return response.data;
+  },
+
+  async getForecastDaily() {
+    const response = await api.get("/analytics/forecast/daily");
+    return response.data;
+  },
+
+  async getForecastPeakLoad() {
+    const response = await api.get("/analytics/forecast/peak-load");
+    return response.data;
+  },
+
+  async getForecastConfidence() {
+    const response = await api.get("/analytics/forecast/confidence");
+    return response.data;
+  },
+
+  async getRecommendations() {
+    const response = await api.get("/analytics/recommendations");
+    return response.data;
+  },
+
   async getTodayEnergy() {
     const response = await api.get("/analytics/today-energy");
     return response.data;
@@ -26,42 +51,8 @@ const analyticsService = {
     return response.data;
   },
 
-  async getAIEfficiency() {
+  async getAiEfficiency() {
     const response = await api.get("/analytics/ai-efficiency");
-    return response.data;
-  },
-
-  // -----------------------------------------------------------------------
-  // Day 14 — AI Forecast Module
-  // -----------------------------------------------------------------------
-
-  /** 24-hour load prediction */
-  async getForecastHourly() {
-    const response = await api.get("/analytics/forecast/hourly");
-    return response.data;
-  },
-
-  /** 7-day load prediction */
-  async getForecastDaily() {
-    const response = await api.get("/analytics/forecast/daily");
-    return response.data;
-  },
-
-  /** Peak load prediction */
-  async getForecastPeakLoad() {
-    const response = await api.get("/analytics/forecast/peak-load");
-    return response.data;
-  },
-
-  /** Prediction confidence metrics */
-  async getForecastConfidence() {
-    const response = await api.get("/analytics/forecast/confidence");
-    return response.data;
-  },
-
-  /** AI recommendations */
-  async getRecommendations() {
-    const response = await api.get("/analytics/recommendations");
     return response.data;
   },
 };
