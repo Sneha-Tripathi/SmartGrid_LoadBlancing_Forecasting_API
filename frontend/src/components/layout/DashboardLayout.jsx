@@ -3,16 +3,30 @@ import DashboardNavbar from "./DashboardNavbar";
 
 export default function DashboardLayout({ children }) {
   return (
-    <div className="min-h-screen flex bg-[#050816] text-white">
+    <div className="flex min-h-screen bg-[#050816]">
+
+      {/* Sidebar */}
 
       <Sidebar />
 
-      <div className="flex-1 flex flex-col">
+      {/* Main Content */}
+
+      <div className="flex-1 flex flex-col overflow-hidden">
+
+        {/* Navbar */}
 
         <DashboardNavbar />
 
-        <main className="p-8">
-          {children}
+        {/* Page Content */}
+
+        <main className="flex-1 overflow-y-auto p-8">
+
+          <div className="max-w-[1700px] mx-auto">
+
+            {children}
+
+          </div>
+
         </main>
 
       </div>

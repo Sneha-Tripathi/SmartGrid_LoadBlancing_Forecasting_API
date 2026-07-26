@@ -1,4 +1,4 @@
-import { FaArrowRight, FaBolt } from "react-icons/fa";
+import { FaBolt } from "react-icons/fa";
 import Button from "../common/Button";
 
 export default function CTA() {

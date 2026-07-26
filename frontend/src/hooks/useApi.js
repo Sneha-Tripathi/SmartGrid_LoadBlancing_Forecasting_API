@@ -1,45 +1,112 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 
-export default function useApi(apiFunction, dependencies = []) {
-  const [data, setData] = useState(null);
+/**
+ * Enhanced useApi hook with cancellation, and proper loading/error states.
+ * Retry is handled by the Axios interceptor in api.js.
+ *
+ * @param {Function} apiFunction - An async function that returns data
+ * @param {Object} options
+ * @param {Array} options.dependencies - useEffect dependencies
+ * @param {boolean} options.enabled - Conditionally enable the request (default: true)
+ * @param {function} options.onSuccess - Callback on success
+ * @param {function} options.onError - Callback on error
+ * @param {*} options.initialData - Initial data value before fetch
+ * @returns {{ data, loading, error, execute, refresh, cancel, setData }}
+ */
+export default function useApi(apiFunction, options = {}) {
+  const {
+    dependencies: deps = [],
+    enabled = true,
+    onSuccess,
+    onError,
+    initialData = null,
+  } = options;
 
-  const [loading, setLoading] = useState(true);
-
+  const [data, setData] = useState(initialData);
+  const [loading, setLoading] = useState(enabled);
   const [error, setError] = useState(null);
+  const abortControllerRef = useRef(null);
+  const mountedRef = useRef(true);
 
-  useEffect(() => {
-    let isMounted = true;
+  const cancel = useCallback(() => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      abortControllerRef.current = null;
+    }
+  }, []);
 
-    async function fetchData() {
+  const execute = useCallback(async (overrideFn) => {
+    const fn = overrideFn || apiFunction;
+    if (typeof fn !== "function") return;
+
+    // Cancel any in-flight request
+    cancel();
+
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+
+    setLoading(true);
+    setError(null);
+
+    const attemptFetch = async () => {
+      if (!mountedRef.current || controller.signal.aborted) return;
+
       try {
-        setLoading(true);
+        const result = await fn(controller.signal);
 
-        const result = await apiFunction();
-
-        if (isMounted) {
+        if (mountedRef.current && !controller.signal.aborted) {
           setData(result);
+          setError(null);
+          onSuccess?.(result);
         }
       } catch (err) {
-        if (isMounted) {
-          setError(err);
-        }
-      } finally {
-        if (isMounted) {
-          setLoading(false);
-        }
+        if (!mountedRef.current || controller.signal.aborted) return;
+
+        // Note: Retry is handled by the Axios interceptor (api.js).
+        // We don't retry here to avoid duplicate retries.
+        setError(err);
+        onError?.(err);
       }
+    };
+
+    await attemptFetch();
+
+    if (mountedRef.current) {
+      setLoading(false);
+    }
+  }, [apiFunction, onSuccess, onError, cancel]);
+
+  const refresh = useCallback(() => {
+    // Clear cache for this request if cached
+    if (typeof apiFunction === "function") {
+      // We can't easily clear cache without a config, but execute will refetch
+    }
+    return execute();
+  }, [execute]);
+
+  useEffect(() => {
+    mountedRef.current = true;
+
+    if (!enabled || typeof apiFunction !== "function") {
+      setLoading(false);
+      return;
     }
 
-    fetchData();
+    execute();
 
     return () => {
-      isMounted = false;
+      mountedRef.current = false;
+      cancel();
     };
-  }, dependencies);
+  }, [enabled, ...deps]);
 
   return {
     data,
     loading,
     error,
+    execute,
+    refresh,
+    cancel,
+    setData,
   };
 }

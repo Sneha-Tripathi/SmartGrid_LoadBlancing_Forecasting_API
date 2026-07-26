@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.websocket import websocket_endpoint
 from app.api.status import router as status_router
+from app.routers import energy, analytics, meter, auth
 
 # -------------------------------
 # FastAPI App
@@ -19,6 +20,10 @@ app = FastAPI(
 # -------------------------------
 
 app.include_router(status_router)
+app.include_router(energy.router)
+app.include_router(analytics.router)
+app.include_router(meter.router)
+app.include_router(auth.router)
 
 # -------------------------------
 # CORS
@@ -57,44 +62,7 @@ def dashboard_cards():
         "grid_health": 98,
     }
 
-# -------------------------------
-# Meter Monitoring
-# -------------------------------
 
-@app.get("/meters")
-def meters():
-    return [
-        {
-            "id": "MTR-101",
-            "zone": "North",
-            "load": "2.45 MW",
-            "status": "Normal",
-        },
-        {
-            "id": "MTR-102",
-            "zone": "South",
-            "load": "3.82 MW",
-            "status": "High",
-        },
-        {
-            "id": "MTR-103",
-            "zone": "East",
-            "load": "1.98 MW",
-            "status": "Normal",
-        },
-        {
-            "id": "MTR-104",
-            "zone": "West",
-            "load": "4.76 MW",
-            "status": "Critical",
-        },
-        {
-            "id": "MTR-105",
-            "zone": "Central",
-            "load": "2.89 MW",
-            "status": "Normal",
-        },
-    ]
 
 # -------------------------------
 # Alerts
@@ -143,61 +111,6 @@ def activity():
             "time": "08:58",
             "event": "Critical Alert Resolved",
         },
-    ]
-
-# -------------------------------
-# Energy Load Trend
-# -------------------------------
-
-@app.get("/energy/load-trend")
-def load_trend():
-    return [
-        {"time": "10 AM", "load": 210},
-        {"time": "11 AM", "load": 240},
-        {"time": "12 PM", "load": 280},
-        {"time": "1 PM", "load": 260},
-        {"time": "2 PM", "load": 310},
-        {"time": "3 PM", "load": 295},
-    ]
-
-# -------------------------------
-# Energy Forecast
-# -------------------------------
-
-@app.get("/energy/forecast")
-def energy_forecast():
-    return [
-        {"day": "Mon", "value": 300},
-        {"day": "Tue", "value": 340},
-        {"day": "Wed", "value": 320},
-        {"day": "Thu", "value": 360},
-        {"day": "Fri", "value": 390},
-    ]
-
-# -------------------------------
-# Zone Distribution
-# -------------------------------
-
-@app.get("/energy/zones")
-def zones():
-    return [
-        {"name": "North", "value": 35},
-        {"name": "South", "value": 25},
-        {"name": "East", "value": 20},
-        {"name": "West", "value": 20},
-    ]
-
-# -------------------------------
-# Power Consumption
-# -------------------------------
-
-@app.get("/energy/consumption")
-def consumption():
-    return [
-        {"zone": "North", "power": 420},
-        {"zone": "South", "power": 350},
-        {"zone": "East", "power": 310},
-        {"zone": "West", "power": 390},
     ]
 
 # -------------------------------

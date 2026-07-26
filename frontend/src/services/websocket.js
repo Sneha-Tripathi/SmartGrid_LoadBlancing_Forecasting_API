@@ -2,7 +2,7 @@ class WebSocketService {
   constructor() {
     this.socket = null;
     this.reconnectTimer = null;
-    this.url = "ws://127.0.0.1:8000/ws";
+    this.url = import.meta.env.VITE_SOCKET_URL || "ws://localhost:8000/ws";
   }
 
   connect(onMessage, onOpen, onClose, onError) {

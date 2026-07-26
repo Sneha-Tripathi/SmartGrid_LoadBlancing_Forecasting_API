@@ -24,11 +24,11 @@ const dashboardService = {
     }
   },
 
-  // Smart Meter Data
+  // Smart Meter Data (returns array for backward compat)
   async getMeters() {
     try {
-      const response = await api.get("/meters");
-      return response.data;
+      const response = await api.get("/meters/", { params: { page_size: 100 } });
+      return response.data.items || response.data;
     } catch (error) {
       console.error("Error fetching meter data:", error);
       throw error;

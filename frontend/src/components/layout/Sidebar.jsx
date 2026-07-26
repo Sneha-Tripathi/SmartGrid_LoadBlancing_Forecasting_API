@@ -1,86 +1,75 @@
 import { NavLink } from "react-router-dom";
 import {
-  FaBolt,
   FaHome,
-  FaTachometerAlt,
   FaBroadcastTower,
   FaChartLine,
-  FaBell,
+  FaExclamationTriangle,
   FaFileAlt,
   FaCog,
-  FaChevronLeft,
+  FaBolt,
+  FaMicrochip,
 } from "react-icons/fa";
 
 const menuItems = [
   {
-    name: "Home",
-    path: "/",
-    icon: <FaHome />,
-  },
-  {
     name: "Dashboard",
+    icon: FaHome,
     path: "/dashboard",
-    icon: <FaTachometerAlt />,
   },
   {
     name: "Monitoring",
+    icon: FaBroadcastTower,
     path: "/monitoring",
-    icon: <FaBroadcastTower />,
   },
   {
     name: "Analytics",
+    icon: FaChartLine,
     path: "/analytics",
-    icon: <FaChartLine />,
+  },
+  {
+    name: "Meters",
+    icon: FaMicrochip,
+    path: "/meters",
   },
   {
     name: "Alerts",
+    icon: FaExclamationTriangle,
     path: "/alerts",
-    icon: <FaBell />,
   },
   {
     name: "Reports",
+    icon: FaFileAlt,
     path: "/reports",
-    icon: <FaFileAlt />,
   },
   {
     name: "Settings",
+    icon: FaCog,
     path: "/settings",
-    icon: <FaCog />,
   },
 ];
 
 export default function Sidebar() {
   return (
-    <aside
-      className="
-      hidden
-      lg:flex
-      w-72
-      min-h-screen
-      bg-[#08111f]
-      border-r
-      border-slate-800
-      flex-col
-      "
-    >
+    <aside className="w-72 min-h-screen bg-[#08111F] border-r border-slate-800 flex flex-col">
+
       {/* Logo */}
 
-      <div className="h-24 border-b border-slate-800 flex items-center px-7">
+      <div className="h-20 flex items-center px-7 border-b border-slate-800">
 
-        <div className="w-12 h-12 rounded-xl bg-teal-700 flex items-center justify-center">
+        <div className="w-11 h-11 rounded-xl bg-gradient-to-r from-cyan-500 to-teal-500 flex items-center justify-center">
 
-          <FaBolt className="text-white text-lg" />
+          <FaBolt className="text-white text-xl" />
 
         </div>
 
-        <div className="ml-4">
+        <div className="ml-3">
 
-          <h2 className="text-xl font-bold text-white">
+          <h2 className="text-white font-bold text-lg">
             Smart Grid
           </h2>
 
-          <p className="text-xs text-slate-400">
-            AI Dashboard
+          <p className="text-slate-400 text-xs">
+            Monitoring System
           </p>
 
         </div>
@@ -89,100 +78,55 @@ export default function Sidebar() {
 
       {/* Navigation */}
 
-      <nav className="flex-1 px-5 py-8">
+      <nav className="flex-1 py-8">
 
-        <p className="text-xs uppercase tracking-widest text-slate-500 mb-5">
-          Navigation
-        </p>
+        <ul className="space-y-2 px-4">
 
-        <div className="space-y-2">
+          {menuItems.map((item) => {
+            const Icon = item.icon;
 
-          {menuItems.map((item) => (
-            <NavLink
-              key={item.name}
-              to={item.path}
-              className={({ isActive }) =>
-                `
-                flex
-                items-center
-                gap-4
-                px-4
-                py-3
-                rounded-xl
-                transition-all
-                duration-300
-                ${
-                  isActive
-                    ? "bg-teal-700 text-white"
-                    : "text-slate-300 hover:bg-[#0B1220] hover:text-teal-400"
-                }
-                `
-              }
-            >
-              <span className="text-lg">
-                {item.icon}
-              </span>
+            return (
+              <li key={item.name}>
 
-              <span className="font-medium">
-                {item.name}
-              </span>
-            </NavLink>
-          ))}
+                <NavLink
+                  to={item.path}
+                  className={({ isActive }) =>
+                    `flex items-center gap-4 px-5 py-3 rounded-xl transition-all duration-300 ${
+                      isActive
+                        ? "bg-gradient-to-r from-cyan-600 to-teal-600 text-white shadow-lg"
+                        : "text-slate-400 hover:bg-[#101827] hover:text-white"
+                    }`
+                  }
+                >
+                  <Icon className="text-lg" />
 
-        </div>
+                  <span className="font-medium">
+                    {item.name}
+                  </span>
+
+                </NavLink>
+
+              </li>
+            );
+          })}
+
+        </ul>
 
       </nav>
 
-      {/* Status Card */}
+      {/* Footer */}
 
-      <div className="p-5">
+      <div className="border-t border-slate-800 p-5">
 
-        <div
-          className="
-          rounded-2xl
-          bg-[#0B1220]
-          border
-          border-slate-700
-          p-5
-          "
-        >
-          <div className="flex items-center justify-between">
+        <div className="bg-[#101827] rounded-xl p-4">
 
-            <h3 className="font-semibold">
-              Grid Status
-            </h3>
-
-            <FaChevronLeft className="rotate-180 text-slate-500" />
-
-          </div>
-
-          <div className="mt-6 flex items-center gap-3">
-
-            <div className="w-3 h-3 rounded-full bg-green-400 animate-pulse"></div>
-
-            <span className="text-green-400 font-medium">
-              Online
-            </span>
-
-          </div>
-
-          <p className="text-sm text-slate-400 mt-3 leading-6">
-            Smart Grid monitoring system is connected and receiving live data.
+          <p className="text-white font-semibold">
+            Smart Grid
           </p>
 
-          <button
-            className="
-            mt-6
-            w-full
-            h-11
-            rounded-xl
-            bg-teal-700
-            hover:bg-teal-600
-            transition
-            "
-          >
-            View Status
-          </button>
+          <p className="text-slate-400 text-sm mt-1">
+            Version 1.0.0
+          </p>
 
         </div>
 

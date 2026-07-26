@@ -126,7 +126,7 @@ export default function Navbar() {
 
           <div className="flex items-center gap-3 shrink-0">
             
-            <ConnectionBadge />
+            
             <Link
               to="/login"
               className="px-5 py-2 rounded-lg border border-teal-500 text-white hover:bg-teal-600 transition"
@@ -186,27 +186,39 @@ export default function Navbar() {
           <div className="lg:hidden border-t border-slate-800 py-6 space-y-5">
 
             {navItems.map((item) => (
-              <a
-                key={item}
-                href="#"
-                className="block text-slate-300"
-              >
-                {item}
-              </a>
+              item.path.startsWith("/") ? (
+                <Link
+                  key={item.name}
+                  to={item.path}
+                  className="block text-slate-300 hover:text-teal-400 transition"
+                  onClick={() => setMobileMenu(false)}
+                >
+                  {item.name}
+                </Link>
+              ) : (
+                <a
+                  key={item.name}
+                  href={item.path}
+                  className="block text-slate-300 hover:text-teal-400 transition"
+                >
+                  {item.name}
+                </a>
+              )
             ))}
 
-            <Button
-              variant="outline"
-              className="w-full h-10"
+            <Link
+              to="/login"
+              className="block w-full px-5 py-2 rounded-lg border border-teal-500 text-white hover:bg-teal-600 transition text-center"
             >
               Login
-            </Button>
+            </Link>
 
-            <Button
-              className="w-full h-10"
+            <Link
+              to="/signup"
+              className="block w-full px-5 py-2 rounded-lg bg-teal-600 hover:bg-teal-500 text-white transition text-center"
             >
               Sign Up
-            </Button>
+            </Link>
 
           </div>
 

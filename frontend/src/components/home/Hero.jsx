@@ -1,14 +1,16 @@
 import {
-  FaArrowRight,
   FaPlay,
   FaCheckCircle,
 } from "react-icons/fa";
 
 import Button from "../common/Button";
 import HeroImage from "../../assets/images/hero-grid.png";
-
+import { useNavigate } from "react-router-dom";
 export default function Hero() {
+
+  const navigate = useNavigate();
   return (
+    
     <section className="relative overflow-hidden">
 
       {/* Background Glow */}
@@ -19,7 +21,7 @@ export default function Hero() {
 
       <div className="section pt-16 lg:pt-12 pb-10">
 
-        <div className="grid lg:grid-cols-2 items-center gap-16">
+        <div className="grid lg:grid-cols-2 items-center gap-10">
 
           {/* LEFT */}
 
@@ -68,7 +70,7 @@ export default function Hero() {
 
             <p
               className="
-              mt-8
+              mt-4
               max-w-xl
               text-lg
               leading-8
@@ -83,23 +85,55 @@ export default function Hero() {
 
             {/* Buttons */}
 
-            <div className="flex flex-wrap gap-5 mt-10">
+            {/* Buttons */}
 
-              <Button icon>
+<div className="flex flex-wrap items-center gap-5 mt-6 relative z-20">
 
-                Get Started
+  <button
+    onClick={() => navigate("/dashboard")}
+    className="
+      px-8
+      py-4
+      rounded-xl
+      bg-gradient-to-r
+      from-cyan-500
+      to-teal-500
+      text-white
+      font-semibold
+      shadow-lg
+      shadow-cyan-500/20
+      hover:scale-105
+      hover:shadow-cyan-500/40
+      transition-all
+      duration-300
+    "
+  >
+    Get Started →
+  </button>
 
-              </Button>
+  <button
+    onClick={() => navigate("/monitoring")}
+    className="
+      px-8
+      py-4
+      rounded-xl
+      border
+      border-cyan-500/60
+      bg-[#101827]/80
+      backdrop-blur-md
+      text-white
+      font-semibold
+      hover:border-cyan-400
+      hover:bg-cyan-500/10
+      hover:scale-105
+      transition-all
+      duration-300
+    "
+  >
+    ▶ Live Demo
+  </button>
 
-              <Button variant="secondary">
-
-                <FaPlay />
-
-                Live Demo
-
-              </Button>
-
-            </div>
+</div>
 
             {/* Features */}
 
@@ -197,26 +231,43 @@ export default function Hero() {
 
           </div>
 
+          
+
           {/* RIGHT */}
 
-          <div className="relative flex justify-center">
+<div
+  className="
+    relative
+    flex
+    items-start
+    justify-center
+    pt-16
+    w-full
+    h-full
+    overflow-visible
+    lg:-mt-24
+    xl:-mt-32
+  "
+>
+  <img
+    src={HeroImage}
+    alt="Smart Grid"
 
-            {/* Image */}
-
-            <img
-              src={HeroImage}
-              alt="Smart Grid"
-              className="
-              w-full
-              max-w-[650px]
-              object-contain
-              drop-shadow-[0_30px_70px_rgba(15,118,110,.25)]
-              relative
-              z-10
-              "
-            />
-
-          </div>
+    className="
+      w-full
+      max-w-[900px]
+      xl:max-w-[980px]
+      object-contain
+      object-top
+      drop-shadow-[0_45px_90px_rgba(6,182,212,0.30)]
+      transition-all
+      duration-500
+      hover:scale-[1.03]
+      relative
+      z-10
+    "
+  />
+</div>
 
         </div>
 
