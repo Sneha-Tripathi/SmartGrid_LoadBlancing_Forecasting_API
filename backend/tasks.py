@@ -1,24 +1,27 @@
 from celery_app import celery
 from database import SessionLocal
 from models import MeterData
+from logging_config import logger
 import datetime
 import crud
 
 
 @celery.task
 def calculate_load():
+    logger.info("=" * 50)
+    logger.info("Periodic Task Starting")
+    logger.info(f"Time: {datetime.datetime.now()}")
+
     db = SessionLocal()
 
     records = db.query(MeterData).all()
 
-    print("=" * 50)
-    print("Periodic Task Running")
-    print("Time:", datetime.datetime.now())
-    print("Total Records:", len(records))
+    logger.info(f"Total Records Found: {len(records)}")
 
     for record in records:
 
-        print(
+        logger.info(
+            f"Processing Record ID {record.id}: "
             f"Voltage={record.voltage}, "
             f"Current={record.current}, "
             f"Power={record.power}"
@@ -33,7 +36,7 @@ def calculate_load():
         elif record.power >= 1000:
             status = "WARNING"
 
-        print(f"Status : {status}")
+        logger.info(f"Status for Record ID {record.id}: {status}")
 
         if status != "NORMAL":
 
@@ -44,8 +47,12 @@ def calculate_load():
                 status=status
             )
 
-            print(f"⚠ {status} Alert Generated!")
+            logger.warning(f"Alert Generated! Zone=Zone A, Load={record.power}, Status={status}")
 
     db.close()
 
-    return f"{len(records)} records processed"
+    result_msg = f"{len(records)} records processed"
+    logger.info(f"Periodic Task Completed: {result_msg}")
+    logger.info("=" * 50)
+
+    return result_msg
