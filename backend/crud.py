@@ -1,21 +1,10 @@
 from sqlalchemy.orm import Session
-from models import MeterData, AggregatedLoad
-from models import Alert
+from models import MeterData, AggregatedLoad, Alert
 
 
-def create_alert(db, zone, load, status):
-    alert = Alert(
-        zone=zone,
-        load=load,
-        status=status
-    )
-
-    db.add(alert)
-    db.commit()
-    db.refresh(alert)
-
-    return alert
-
+# ==========================
+# Meter Data CRUD
+# ==========================
 
 def create_meter_data(db: Session, data):
     meter = MeterData(
@@ -37,11 +26,15 @@ def get_all_meter_data(db: Session):
 
 
 def get_meter_data_by_id(db: Session, meter_id: int):
-    return db.query(MeterData).filter(MeterData.id == meter_id).first()
+    return db.query(MeterData).filter(
+        MeterData.id == meter_id
+    ).first()
 
 
 def update_meter_data(db: Session, meter_id: int, data):
-    meter = db.query(MeterData).filter(MeterData.id == meter_id).first()
+    meter = db.query(MeterData).filter(
+        MeterData.id == meter_id
+    ).first()
 
     if meter is None:
         return None
@@ -58,7 +51,9 @@ def update_meter_data(db: Session, meter_id: int, data):
 
 
 def delete_meter_data(db: Session, meter_id: int):
-    meter = db.query(MeterData).filter(MeterData.id == meter_id).first()
+    meter = db.query(MeterData).filter(
+        MeterData.id == meter_id
+    ).first()
 
     if meter is None:
         return None
@@ -76,6 +71,10 @@ def get_latest_meter_data(db: Session):
         .first()
     )
 
+
+# ==========================
+# Aggregated Load CRUD
+# ==========================
 
 def create_aggregated_load(
     db,
@@ -98,6 +97,11 @@ def create_aggregated_load(
 
     return load
 
+
+# ==========================
+# Alert CRUD
+# ==========================
+
 def create_alert(db, zone, load, status):
     alert = Alert(
         zone=zone,
@@ -110,3 +114,58 @@ def create_alert(db, zone, load, status):
     db.refresh(alert)
 
     return alert
+
+
+# API se alert create karne ke liye
+def create_alert_api(db: Session, alert):
+    new_alert = Alert(
+        zone=alert.zone,
+        load=alert.load,
+        status=alert.status
+    )
+
+    db.add(new_alert)
+    db.commit()
+    db.refresh(new_alert)
+
+    return new_alert
+
+
+def get_alerts(db: Session):
+    return (
+        db.query(Alert)
+        .order_by(Alert.id.desc())
+        .all()
+    )
+
+
+def get_alert(db: Session, alert_id: int):
+    return (
+        db.query(Alert)
+        .filter(Alert.id == alert_id)
+        .first()
+    )
+
+
+def delete_alert(db: Session, alert_id: int):
+    alert = (
+        db.query(Alert)
+        .filter(Alert.id == alert_id)
+        .first()
+    )
+
+    if alert is None:
+        return None
+
+    db.delete(alert)
+    db.commit()
+
+    return alert
+
+
+def get_alert_by_status(db: Session, status: str):
+    return (
+        db.query(Alert)
+        .filter(Alert.status == status)
+        .all()
+    )

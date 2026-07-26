@@ -26,3 +26,20 @@ class MeterDataResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+class AlertBase(BaseModel):
+    zone: str
+    load: float
+    status: str
+
+
+class AlertOut(AlertBase):
+    id: int
+
+    class Config:
+        from_attributes = True
+
+class AlertCreate(BaseModel):
+    zone: str
+    load: float
+    status: str

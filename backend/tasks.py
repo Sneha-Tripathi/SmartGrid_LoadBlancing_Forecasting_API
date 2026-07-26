@@ -17,32 +17,34 @@ def calculate_load():
     print("Total Records:", len(records))
 
     for record in records:
+
         print(
             f"Voltage={record.voltage}, "
             f"Current={record.current}, "
             f"Power={record.power}"
         )
 
-         # Threshold Detection
+        # High Load Detection
+        status = "NORMAL"
+
         if record.power > 1200:
+            status = "CRITICAL"
+
+        elif record.power >= 1000:
+            status = "WARNING"
+
+        print(f"Status : {status}")
+
+        if status != "NORMAL":
 
             crud.create_alert(
                 db=db,
                 zone="Zone A",
                 load=record.power,
-                status="HIGH LOAD"
+                status=status
             )
 
-            print("⚠ Alert Generated!")
-
-
-
-
-
-
-
-
-
+            print(f"⚠ {status} Alert Generated!")
 
     db.close()
 
