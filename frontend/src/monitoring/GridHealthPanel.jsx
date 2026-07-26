@@ -4,19 +4,10 @@ import { useWebSocketContext } from "../context/WebSocketContext";
 
 const GridHealthPanel = memo(function GridHealthPanel() {
   const { liveData, connected } = useWebSocketContext();
-
   const status = liveData?.status || "Normal";
   const alert = liveData?.alert || "Grid Operating Normally";
-
-  const statusColor =
-    status === "Critical" ? "text-red-400" : status === "Warning" ? "text-yellow-400" : "text-green-400";
-
-  const icon = status === "Critical" ? (
-    <FaExclamationTriangle className="text-red-400 text-3xl" />
-  ) : (
-    <FaCheckCircle className="text-green-400 text-3xl" />
-  );
-
+  const statusColor = status === "Critical" ? "text-red-400" : status === "Warning" ? "text-yellow-400" : "text-green-400";
+  const icon = status === "Critical" ? <FaExclamationTriangle className="text-red-400 text-3xl" /> : <FaCheckCircle className="text-green-400 text-3xl" />;
   return (
     <div className="bg-[#101827] border border-slate-800 rounded-2xl p-6">
       <div className="flex items-center justify-between">
@@ -46,5 +37,4 @@ const GridHealthPanel = memo(function GridHealthPanel() {
     </div>
   );
 });
-
 export default GridHealthPanel;

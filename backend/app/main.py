@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.websocket import websocket_endpoint
 from app.api.status import router as status_router
-from app.routers import energy, analytics, meter, auth
+from app.routers import energy, analytics, meter, auth, alert, dashboard
 
 # -------------------------------
 # FastAPI App
@@ -24,6 +24,8 @@ app.include_router(energy.router)
 app.include_router(analytics.router)
 app.include_router(meter.router)
 app.include_router(auth.router)
+app.include_router(alert.router)
+app.include_router(dashboard.router)
 
 # -------------------------------
 # CORS

@@ -26,7 +26,7 @@ def prediction_accuracy():
 
 @router.get("/carbon-saved")
 def carbon_saved():
-    return {"value": round(random.uniform(12.0, 28.5), 1), "unit": "tons CO\u2082", "change": round(random.uniform(1.0, 5.0), 1), "trend": "up"}
+    return {"value": round(random.uniform(12.0, 28.5), 1), "unit": "tons CO2", "change": round(random.uniform(1.0, 5.0), 1), "trend": "up"}
 
 @router.get("/ai-efficiency")
 def ai_efficiency():

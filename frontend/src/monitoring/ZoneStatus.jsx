@@ -1,69 +1,31 @@
 import { memo } from "react";
-import { FaCheckCircle, FaExclamationTriangle, FaInfoCircle } from "react-icons/fa";
-import { useWebSocketContext } from "../context/WebSocketContext";
+import { FaCheckCircle, FaExclamationTriangle } from "react-icons/fa";
 
-const ZONES = ["North Zone", "South Zone", "East Zone", "West Zone", "Central Zone"];
-
-const getStatusIcon = (status) => {
-  switch (status) {
-    case "Normal": return <FaCheckCircle className="text-green-400" />;
-    case "Warning":
-    case "High": return <FaExclamationTriangle className="text-yellow-400" />;
-    case "Critical": return <FaExclamationTriangle className="text-red-400" />;
-    default: return <FaInfoCircle className="text-cyan-400" />;
-  }
-};
-
-const getStatusBg = (status) => {
-  switch (status) {
-    case "Normal": return "bg-green-500/10 border-green-500/20";
-    case "Warning":
-    case "High": return "bg-yellow-500/10 border-yellow-500/20";
-    case "Critical": return "bg-red-500/10 border-red-500/20";
-    default: return "bg-slate-500/10 border-slate-500/20";
-  }
-};
-
-const getStatusText = (status) => {
-  switch (status) {
-    case "Normal": return "text-green-400";
-    case "Warning":
-    case "High": return "text-yellow-400";
-    case "Critical": return "text-red-400";
-    default: return "text-slate-400";
-  }
-};
+const zones = [
+  { name: "North Zone", status: "Normal", load: "2.45 MW", color: "text-green-400" },
+  { name: "South Zone", status: "High", load: "3.82 MW", color: "text-yellow-400" },
+  { name: "East Zone", status: "Normal", load: "1.98 MW", color: "text-green-400" },
+  { name: "West Zone", status: "Critical", load: "4.76 MW", color: "text-red-400" },
+  { name: "Central Zone", status: "Normal", load: "2.89 MW", color: "text-green-400" },
+];
 
 const ZoneStatus = memo(function ZoneStatus() {
-  const { liveData } = useWebSocketContext();
-
-  const zoneStatuses = {
-    "North Zone": liveData?.status === "Critical" ? "Warning" : "Normal",
-    "South Zone": liveData?.status === "Warning" ? "High" : "Normal",
-    "East Zone": "Normal",
-    "West Zone": liveData?.status === "Critical" ? "Critical" : liveData?.status === "Warning" ? "Warning" : "Normal",
-    "Central Zone": liveData?.status === "Warning" ? "Warning" : "Normal",
-  };
-
   return (
     <div className="bg-[#101827] border border-slate-800 rounded-2xl p-6">
       <h2 className="text-xl font-semibold text-white mb-6">Zone Status</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
-        {ZONES.map((zone) => {
-          const status = zoneStatuses[zone] || "Normal";
-          return (
-            <div key={zone} className={`${getStatusBg(status)} border rounded-2xl p-5 transition-all duration-300 hover:scale-[1.02]`}>
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="text-white font-semibold text-sm">{zone}</h3>
-                {getStatusIcon(status)}
-              </div>
-              <p className={`text-xs font-medium ${getStatusText(status)}`}>{status}</p>
+        {zones.map((zone) => (
+          <div key={zone.name} className="bg-[#0B1220] border border-slate-700 rounded-xl p-4">
+            <div className="flex items-center gap-2 mb-2">
+              {zone.status === "Critical" ? <FaExclamationTriangle className="text-red-400" /> : zone.status === "High" || zone.status === "Warning" ? <FaExclamationTriangle className="text-yellow-400" /> : <FaCheckCircle className="text-green-400" />}
+              <h3 className="text-white font-medium text-sm">{zone.name}</h3>
             </div>
-          );
-        })}
+            <p className={`text-lg font-bold ${zone.color}`}>{zone.status}</p>
+            <p className="text-slate-400 text-sm mt-1">Load: {zone.load}</p>
+          </div>
+        ))}
       </div>
     </div>
   );
 });
-
 export default ZoneStatus;

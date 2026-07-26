@@ -15,7 +15,18 @@ def register_user(name: str, email: str, password: str, phone: Optional[str] = N
             return None
     now = datetime.now(timezone.utc).isoformat()
     user_id = _create_user_id()
-    user = {"id": user_id, "name": name, "email": email.lower(), "password": hash_password(password), "role": "admin", "phone": phone or "", "avatar": "", "is_active": True, "created_at": now, "updated_at": now}
+    user = {
+        "id": user_id,
+        "name": name,
+        "email": email.lower(),
+        "password": hash_password(password),
+        "role": "admin",
+        "phone": phone or "",
+        "avatar": "",
+        "is_active": True,
+        "created_at": now,
+        "updated_at": now,
+    }
     _users[user_id] = user
     return _sanitize_user(user)
 
@@ -93,7 +104,17 @@ def seed_default_users():
             _users[op["id"]]["role"] = "operator"
 
 def _sanitize_user(user: dict) -> dict:
-    return {"id": user["id"], "name": user["name"], "email": user["email"], "role": user["role"], "phone": user.get("phone", ""), "avatar": user.get("avatar", ""), "is_active": user.get("is_active", True), "created_at": user.get("created_at", ""), "updated_at": user.get("updated_at", "")}
+    return {
+        "id": user["id"],
+        "name": user["name"],
+        "email": user["email"],
+        "role": user["role"],
+        "phone": user.get("phone", ""),
+        "avatar": user.get("avatar", ""),
+        "is_active": user.get("is_active", True),
+        "created_at": user.get("created_at", ""),
+        "updated_at": user.get("updated_at", ""),
+    }
 
 def get_all_users() -> List[dict]:
     return [_sanitize_user(u) for u in _users.values()]

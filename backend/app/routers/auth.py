@@ -42,6 +42,7 @@ REFRESH_EXPIRE_DAYS = 7
 
 seed_default_users()
 
+
 def _get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)):
     if credentials is None:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authenticated", headers={"WWW-Authenticate": "Bearer"})
@@ -58,6 +59,7 @@ def _get_current_user(credentials: HTTPAuthorizationCredentials = Depends(securi
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Account is deactivated")
     return user
 
+
 def _create_tokens(user_id: str) -> dict:
     token_jti = uuid.uuid4().hex
     access_token = create_access_token({"sub": user_id, "jti": uuid.uuid4().hex}, timedelta(minutes=ACCESS_EXPIRE_MINUTES))
@@ -65,6 +67,7 @@ def _create_tokens(user_id: str) -> dict:
     store_refresh_token(token_jti, user_id)
     expires_in = get_token_expires_in(access_token)
     return {"access_token": access_token, "refresh_token": refresh_token, "expires_in": expires_in}
+
 
 @router.post("/register", response_model=UserWithToken, status_code=status.HTTP_201_CREATED)
 def register(payload: UserCreate):
@@ -74,6 +77,7 @@ def register(payload: UserCreate):
     tokens = _create_tokens(user["id"])
     return {**user, **tokens, "token_type": "bearer"}
 
+
 @router.post("/login", response_model=UserWithToken)
 def login(payload: UserLogin):
     user = authenticate_user(payload.email, payload.password)
@@ -81,6 +85,7 @@ def login(payload: UserLogin):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid email or password")
     tokens = _create_tokens(user["id"])
     return {**user, **tokens, "token_type": "bearer"}
+
 
 @router.post("/refresh", response_model=TokenResponse)
 def refresh(payload: RefreshRequest):
@@ -100,6 +105,7 @@ def refresh(payload: RefreshRequest):
     tokens = _create_tokens(user_id)
     return {**tokens, "token_type": "bearer"}
 
+
 @router.post("/logout", status_code=status.HTTP_200_OK)
 def logout(payload: RefreshRequest):
     payload_data = decode_refresh_token(payload.refresh_token)
@@ -109,14 +115,17 @@ def logout(payload: RefreshRequest):
             revoke_refresh_token(jti)
     return {"message": "Logged out successfully"}
 
+
 @router.post("/logout-all", status_code=status.HTTP_200_OK)
 def logout_all(user: dict = Depends(_get_current_user)):
     revoke_all_user_tokens(user["id"])
     return {"message": "Logged out from all devices"}
 
+
 @router.get("/me", response_model=UserResponse)
 def get_me(user: dict = Depends(_get_current_user)):
     return user
+
 
 @router.put("/profile", response_model=UserResponse)
 def update_profile(payload: UpdateProfileRequest, user: dict = Depends(_get_current_user)):
@@ -125,6 +134,7 @@ def update_profile(payload: UpdateProfileRequest, user: dict = Depends(_get_curr
     if updated is None:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Email already in use")
     return updated
+
 
 @router.put("/change-password", status_code=status.HTTP_200_OK)
 def change_password(payload: ChangePasswordRequest, user: dict = Depends(_get_current_user)):

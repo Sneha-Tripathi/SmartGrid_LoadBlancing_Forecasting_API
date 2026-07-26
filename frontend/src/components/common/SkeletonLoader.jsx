@@ -40,6 +40,25 @@ const SkeletonLoader = memo(function SkeletonLoader({ variant = "default", rows 
     );
   }
 
+  if (variant === "alert") {
+    return (
+      <div className="space-y-3 animate-pulse">
+        {Array.from({ length: rows }).map((_, i) => (
+          <div key={i} className="bg-[#101827] border border-slate-800 rounded-2xl p-5">
+            <div className="flex items-start gap-4">
+              <div className="w-10 h-10 rounded-xl bg-slate-700 shrink-0" />
+              <div className="flex-1 space-y-2">
+                <div className="h-5 w-48 bg-slate-700 rounded" />
+                <div className="h-4 w-full bg-slate-700 rounded" />
+                <div className="h-3 w-24 bg-slate-700 rounded" />
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  }
+
   return (
     <div className="bg-[#101827] border border-slate-800 rounded-2xl p-6 animate-pulse">
       <div className="h-6 w-40 bg-slate-700 rounded mb-6" />

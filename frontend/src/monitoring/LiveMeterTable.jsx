@@ -1,5 +1,4 @@
 import { memo, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
 import useApi from "../hooks/useApi";
 import dashboardService from "../services/dashboardService";
 import TableLoader from "../components/common/TableLoader";
@@ -15,30 +14,18 @@ const dummyMeters = [
 
 const getStatusStyle = (status) => {
   switch (status) {
-    case "Active":
-    case "Normal": return "bg-green-500/20 text-green-400";
-    case "Warning":
-    case "High": return "bg-yellow-500/20 text-yellow-400";
+    case "Active": case "Normal": return "bg-green-500/20 text-green-400";
+    case "Warning": case "High": return "bg-yellow-500/20 text-yellow-400";
     case "Critical": return "bg-red-500/20 text-red-400";
     default: return "bg-slate-500/20 text-slate-300";
   }
 };
 
 const LiveMeterTable = memo(function LiveMeterTable() {
-  const navigate = useNavigate();
-  const { data, loading, error } = useApi(() => dashboardService.getMeters());
-
-  const meters = useMemo(() =>
-    Array.isArray(data) && data.length > 0 ? data : dummyMeters,
-    [data]
-  );
-
+  const { data, loading } = useApi(() => dashboardService.getMeters());
+  const meters = useMemo(() => Array.isArray(data) && data.length > 0 ? data : dummyMeters, [data]);
   if (loading) return <TableLoader />;
-  if (!meters || meters.length === 0) {
-    return <EmptyState title="No Meter Data" description="No smart meter records found." />;
-  }
-  if (error) console.warn("Meter API unavailable. Showing fallback data.");
-
+  if (!meters || meters.length === 0) return <EmptyState title="No Meter Data" message="No smart meter records found." />;
   return (
     <div className="bg-[#101827] border border-slate-800 rounded-2xl p-6">
       <h2 className="text-xl font-semibold text-white mb-5">Live Meter Monitoring</h2>
@@ -51,25 +38,16 @@ const LiveMeterTable = memo(function LiveMeterTable() {
               <th className="text-left py-3 text-slate-400">Load</th>
               <th className="text-left py-3 text-slate-400">Voltage</th>
               <th className="text-left py-3 text-slate-400">Status</th>
-              <th className="text-left py-3 text-slate-400">Action</th>
             </tr>
           </thead>
           <tbody>
             {meters.map((meter, index) => (
-              <tr key={meter.id || index} className="border-b border-slate-800 hover:bg-slate-800/40 transition cursor-pointer" onClick={() => navigate(`/meters/${meter.id}`)}>
-                <td className="py-4 text-white font-medium">{meter.id}</td>
+              <tr key={meter.id || index} className="border-b border-slate-800 hover:bg-slate-800/40 transition">
+                <td className="py-4 text-white">{meter.id}</td>
                 <td className="py-4 text-slate-300">{meter.zone}</td>
                 <td className="py-4 text-slate-300">{meter.load}</td>
                 <td className="py-4 text-slate-300">{meter.voltage ?? "--"}</td>
-                <td className="py-4">
-                  <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusStyle(meter.status)}`}>{meter.status}</span>
-                </td>
-                <td className="py-4">
-                  <button onClick={(e) => { e.stopPropagation(); navigate(`/meters/${meter.id}`); }}
-                    className="text-xs text-cyan-400 hover:text-cyan-300 border border-cyan-500/30 px-3 py-1 rounded-lg transition">
-                    View
-                  </button>
-                </td>
+                <td className="py-4"><span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusStyle(meter.status)}`}>{meter.status}</span></td>
               </tr>
             ))}
           </tbody>
@@ -78,5 +56,4 @@ const LiveMeterTable = memo(function LiveMeterTable() {
     </div>
   );
 });
-
 export default LiveMeterTable;
