@@ -27,3 +27,16 @@ class AggregatedLoad(Base):
     average_power = Column(Float)
 
     created_at = Column(DateTime, default=datetime.utcnow)
+
+class Alert(Base):
+    __tablename__ = "alerts"
+
+    id = Column(Integer, primary_key=True, index=True)
+
+    zone = Column(String, nullable=False)
+
+    load = Column(Float, nullable=False)
+
+    status = Column(String, nullable=False)
+
+    created_at = Column(DateTime, default=datetime.utcnow)
