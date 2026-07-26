@@ -1,314 +1,194 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { FaArrowLeft, FaBolt, FaMapMarkerAlt, FaChartLine, FaMicrochip, FaExclamationTriangle, FaHistory, FaClock, FaCheckCircle, FaTimesCircle, FaExclamationCircle, FaInfoCircle, FaCalendarAlt, FaWrench } from "react-icons/fa";
+import {
+  FaMicrochip,
+  FaArrowLeft,
+  FaBolt,
+  FaExclamationTriangle,
+  FaHistory,
+  FaClock,
+  FaCheckCircle,
+  FaTimesCircle,
+  FaInfoCircle,
+} from "react-icons/fa";
 import DashboardLayout from "../components/layout/DashboardLayout";
-import SkeletonLoader from "../components/common/SkeletonLoader";
-import meterService from "../services/meterService";
+import PageLoader from "../components/common/PageLoader";
+import ErrorMessage from "../components/common/ErrorMessage";
+import api from "../services/api";
 
-const STATUS_STYLES = {
-  Normal: "bg-emerald-500/15 text-emerald-400 border border-emerald-500/20",
-  Warning: "bg-amber-500/15 text-amber-400 border border-amber-500/20",
-  High: "bg-orange-500/15 text-orange-400 border border-orange-500/20",
-  Critical: "bg-red-500/15 text-red-400 border border-red-500/20",
+const getStatusStyle = (status) => {
+  switch (status) {
+    case "Normal": return "bg-green-500/20 text-green-400 border-green-500/30";
+    case "Warning": return "bg-yellow-500/20 text-yellow-400 border-yellow-500/30";
+    case "High": return "bg-orange-500/20 text-orange-400 border-orange-500/30";
+    case "Critical": return "bg-red-500/20 text-red-400 border-red-500/30";
+    default: return "bg-slate-500/20 text-slate-300 border-slate-500/30";
+  }
 };
 
-const SEVERITY_STYLES = {
-  Critical: "text-red-400 bg-red-500/10",
-  Warning: "text-amber-400 bg-amber-500/10",
-  Info: "text-cyan-400 bg-cyan-500/10",
+const getTimelineIcon = (type) => {
+  switch (type) {
+    case "error": return <FaTimesCircle className="text-red-400" />;
+    case "warning": return <FaExclamationTriangle className="text-yellow-400" />;
+    case "success": return <FaCheckCircle className="text-green-400" />;
+    default: return <FaInfoCircle className="text-cyan-400" />;
+  }
 };
 
-const EVENT_TYPE_STYLES = {
-  error: { icon: FaTimesCircle, color: "text-red-400", bg: "bg-red-500/10" },
-  warning: { icon: FaExclamationCircle, color: "text-amber-400", bg: "bg-amber-500/10" },
-  success: { icon: FaCheckCircle, color: "text-emerald-400", bg: "bg-emerald-500/10" },
-  info: { icon: FaInfoCircle, color: "text-cyan-400", bg: "bg-cyan-500/10" },
+const getSeverityStyle = (severity) => {
+  switch (severity) {
+    case "Critical": return "bg-red-500/20 text-red-400 border-red-500/30";
+    case "Warning": return "bg-yellow-500/20 text-yellow-400 border-yellow-500/30";
+    case "Info": return "bg-cyan-500/20 text-cyan-400 border-cyan-500/30";
+    default: return "bg-slate-500/20 text-slate-300 border-slate-500/30";
+  }
 };
-
-const TABS = [
-  { id: "overview", label: "Overview", icon: FaBolt },
-  { id: "history", label: "History", icon: FaHistory },
-  { id: "alerts", label: "Alerts", icon: FaExclamationTriangle },
-  { id: "timeline", label: "Timeline", icon: FaClock },
-];
 
 export default function MeterDetail() {
   const { meterId } = useParams();
   const navigate = useNavigate();
   const [meter, setMeter] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState("overview");
+  const [error, setError] = useState(null);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        const result = await meterService.getMeter(meterId);
-        setMeter(result);
-      } catch (err) {
-        console.error("Failed to fetch meter:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
+  const fetchMeter = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await api.get(`/meters/${meterId}`);
+      setMeter(res.data);
+    } catch (err) {
+      setError(err);
+    } finally {
+      setLoading(false);
+    }
   }, [meterId]);
 
-  if (loading) {
-    return (
-      <DashboardLayout>
-        <button onClick={() => navigate("/meters")}
-          className="flex items-center gap-2 text-slate-400 hover:text-white mb-6 transition group">
-          <FaArrowLeft className="group-hover:-translate-x-1 transition" />
-          Back to Meters
-        </button>
-        <SkeletonLoader variant="detail" />
-      </DashboardLayout>
-    );
-  }
+  useEffect(() => { fetchMeter(); }, [fetchMeter]);
 
-  if (!meter) {
-    return (
-      <DashboardLayout>
-        <div className="flex items-center justify-center min-h-[60vh]">
-          <div className="text-center">
-            <FaExclamationTriangle className="text-5xl text-slate-600 mx-auto mb-4" />
-            <h2 className="text-2xl text-white font-bold">Meter Not Found</h2>
-            <p className="text-slate-400 mt-2">The meter {meterId} could not be found.</p>
-            <button onClick={() => navigate("/meters")} className="mt-6 px-6 py-3 bg-cyan-600 hover:bg-cyan-500 text-white rounded-xl transition">Back to Meters</button>
-          </div>
-        </div>
-      </DashboardLayout>
-    );
-  }
+  if (loading) return <DashboardLayout><PageLoader /></DashboardLayout>;
+  if (error) return (
+    <DashboardLayout>
+      <ErrorMessage title="Failed to Load Meter" message={error.response?.data?.detail || error.message} onRetry={fetchMeter} />
+    </DashboardLayout>
+  );
+  if (!meter) return null;
+
+  const infoCards = [
+    { label: "Zone", value: meter.zone, icon: FaMicrochip, color: "text-cyan-400" },
+    { label: "Load", value: meter.load, icon: FaBolt, color: "text-yellow-400" },
+    { label: "Voltage", value: meter.voltage || "--", icon: FaBolt, color: "text-green-400" },
+    { label: "Frequency", value: meter.frequency || "--", icon: FaClock, color: "text-purple-400" },
+  ];
 
   return (
     <DashboardLayout>
-      {/* Back button */}
-      <button
-        onClick={() => navigate("/meters")}
-        className="flex items-center gap-2 text-slate-400 hover:text-white mb-6 transition group"
-      >
-        <FaArrowLeft className="group-hover:-translate-x-1 transition" />
-        Back to Meters
-      </button>
-
-      {/* Meter Header Card */}
-      <section className="bg-[#101827] border border-slate-800 rounded-2xl p-6 mb-6 hover:border-cyan-500/30 transition-all duration-300">
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
-          <div className="flex items-center gap-4">
-            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-cyan-600 to-teal-600 flex items-center justify-center shadow-lg shadow-cyan-500/20">
-              <FaBolt className="text-white text-2xl" />
-            </div>
-            <div>
-              <div className="flex items-center gap-3">
-                <h1 className="text-3xl font-bold text-white">{meter.meter_id}</h1>
-                <span className={`px-3 py-1 rounded-full text-xs font-medium ${STATUS_STYLES[meter.status] || STATUS_STYLES.Normal}`}>
-                  <span className={`inline-block w-1.5 h-1.5 rounded-full mr-1.5 ${
-                    meter.status === "Normal" ? "bg-emerald-400" :
-                    meter.status === "Warning" ? "bg-amber-400" :
-                    meter.status === "High" ? "bg-orange-400" :
-                    "bg-red-400"
-                  }`} />
-                  {meter.status}
-                </span>
-              </div>
-              <p className="text-slate-400 mt-1">{meter.zone} — {meter.location || "Location not set"}</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-3">
-            <span className="text-slate-500 text-sm">Consumer:</span>
-            <span className="text-white font-medium">{meter.consumer || "N/A"}</span>
-          </div>
+      <section className="mb-8">
+        <button onClick={() => navigate("/meters")} className="flex items-center gap-2 text-slate-400 hover:text-white transition mb-4">
+          <FaArrowLeft /> Back to Meters
+        </button>
+        <div className="flex items-center gap-4">
+          <h1 className="text-3xl font-bold text-white">{meter.meter_id}</h1>
+          <span className={`px-3 py-1 rounded-full text-xs font-medium border ${getStatusStyle(meter.status)}`}>{meter.status}</span>
         </div>
-
-        {/* Quick Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6 pt-6 border-t border-slate-800">
-          <QuickStat label="Load" value={meter.load} icon={FaChartLine} color="text-cyan-400" />
-          <QuickStat label="Voltage" value={meter.voltage || "--"} icon={FaBolt} color="text-teal-400" />
-          <QuickStat label="Frequency" value={meter.frequency || "--"} icon={FaMicrochip} color="text-emerald-400" />
-          <QuickStat label="Current" value={meter.current || "--"} icon={FaChartLine} color="text-amber-400" />
-          <QuickStat label="Power Factor" value={meter.power_factor || "--"} icon={FaMicrochip} color="text-purple-400" />
-          <QuickStat label="Type" value={meter.type || "--"} icon={FaMicrochip} color="text-sky-400" />
-          <QuickStat label="Install Date" value={meter.install_date || "--"} icon={FaCalendarAlt} color="text-slate-400" />
-          <QuickStat label="Last Maintenance" value={meter.last_maintenance || "--"} icon={FaWrench} color="text-slate-400" />
-        </div>
+        <p className="text-slate-400 mt-1">{meter.location || meter.zone}</p>
       </section>
 
-      {/* Tabs */}
-      <section className="bg-[#101827] border border-slate-800 rounded-2xl overflow-hidden">
-        <div className="flex border-b border-slate-800 overflow-x-auto">
-          {TABS.map(tab => {
-            const Icon = tab.icon;
-            return (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-2 px-6 py-4 text-sm font-medium transition whitespace-nowrap ${
-                  activeTab === tab.id
-                    ? "text-cyan-400 border-b-2 border-cyan-400 bg-cyan-500/5"
-                    : "text-slate-400 hover:text-white hover:bg-slate-800/30"
-                }`}
-              >
-                <Icon /> {tab.label}
-              </button>
-            );
-          })}
-        </div>
-
-        <div className="p-6">
-          {activeTab === "overview" && <MeterOverview meter={meter} />}
-          {activeTab === "history" && <MeterHistory history={meter.history} />}
-          {activeTab === "alerts" && <MeterAlerts alerts={meter.alerts} />}
-          {activeTab === "timeline" && <MeterTimeline timeline={meter.timeline} />}
-        </div>
-      </section>
-    </DashboardLayout>
-  );
-}
-
-function QuickStat({ label, value, icon: Icon, color }) {
-  return (
-    <div className="bg-[#0B1220] rounded-xl p-4 border border-slate-800/50">
-      <div className="flex items-center gap-2 mb-1">
-        <Icon className={color} />
-        <span className="text-slate-500 text-xs">{label}</span>
-      </div>
-      <p className="text-white font-semibold text-lg">{value}</p>
-    </div>
-  );
-}
-
-function MeterOverview({ meter }) {
-  const totalAlerts = (meter.alerts && meter.alerts.length) || 0;
-  const unresolvedAlerts = (meter.alerts && meter.alerts.filter(a => !a.resolved).length) || 0;
-  const totalEvents = (meter.timeline && meter.timeline.length) || 0;
-  const historyCount = (meter.history && meter.history.length) || 0;
-  return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-      <div className="bg-[#0B1220] rounded-xl p-6 border border-slate-800/50 text-center">
-        <FaHistory className="text-3xl text-cyan-400 mx-auto mb-3" />
-        <p className="text-3xl font-bold text-white">{historyCount}</p>
-        <p className="text-slate-400 text-sm mt-1">History Records</p>
-      </div>
-      <div className="bg-[#0B1220] rounded-xl p-6 border border-slate-800/50 text-center">
-        <FaExclamationTriangle className="text-3xl text-amber-400 mx-auto mb-3" />
-        <p className="text-3xl font-bold text-white">{unresolvedAlerts}</p>
-        <p className="text-slate-400 text-sm mt-1">Active Alerts / {totalAlerts} Total</p>
-      </div>
-      <div className="bg-[#0B1220] rounded-xl p-6 border border-slate-800/50 text-center">
-        <FaClock className="text-3xl text-teal-400 mx-auto mb-3" />
-        <p className="text-3xl font-bold text-white">{totalEvents}</p>
-        <p className="text-slate-400 text-sm mt-1">Timeline Events</p>
-      </div>
-    </div>
-  );
-}
-
-function MeterHistory({ history }) {
-  if (!history || history.length === 0) {
-    return <EmptyTab message="No history records available for this meter." />;
-  }
-  return (
-    <div className="overflow-x-auto">
-      <table className="w-full">
-        <thead>
-          <tr className="border-b border-slate-700">
-            <th className="text-left py-3 px-3 text-slate-400 text-sm">Date</th>
-            <th className="text-left py-3 px-3 text-slate-400 text-sm">Load</th>
-            <th className="text-left py-3 px-3 text-slate-400 text-sm">Voltage</th>
-            <th className="text-left py-3 px-3 text-slate-400 text-sm">Frequency</th>
-            <th className="text-left py-3 px-3 text-slate-400 text-sm">Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          {history.map((record, i) => (
-            <tr key={i} className="border-b border-slate-800 hover:bg-slate-800/40 transition">
-              <td className="py-3 px-3 text-white text-sm">{record.date}</td>
-              <td className="py-3 px-3 text-slate-300 text-sm">{record.load}</td>
-              <td className="py-3 px-3 text-slate-300 text-sm">{record.voltage}</td>
-              <td className="py-3 px-3 text-slate-300 text-sm">{record.frequency}</td>
-              <td className="py-3 px-3">
-                <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${STATUS_STYLES[record.status] || STATUS_STYLES.Normal}`}>
-                  {record.status}
-                </span>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
-}
-
-function MeterAlerts({ alerts }) {
-  if (!alerts || alerts.length === 0) {
-    return <EmptyTab message="No alerts for this meter." />;
-  }
-  return (
-    <div className="space-y-3">
-      {alerts.map((alert, i) => {
-        const severityStyle = SEVERITY_STYLES[alert.severity] || SEVERITY_STYLES.Info;
-        return (
-          <div key={i} className={`flex items-start gap-4 p-4 rounded-xl border border-slate-800 ${!alert.resolved ? "bg-[#0B1220]" : "bg-[#0B1220]/50 opacity-60"}`}>
-            <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${severityStyle}`}>
-              <FaExclamationTriangle />
-            </div>
-            <div className="flex-1">
-              <div className="flex items-center gap-2">
-                <h4 className="text-white font-semibold">{alert.type}</h4>
-                <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${severityStyle}`}>
-                  {alert.severity}
-                </span>
-                {alert.resolved && (
-                  <span className="text-emerald-400 text-xs flex items-center gap-1 ml-auto">
-                    <FaCheckCircle /> Resolved
-                  </span>
-                )}
-              </div>
-              <p className="text-slate-300 text-sm mt-1">{alert.message}</p>
-              <p className="text-slate-500 text-xs mt-1.5">{alert.time}</p>
-            </div>
-          </div>
-        );
-      })}
-    </div>
-  );
-}
-
-function MeterTimeline({ timeline }) {
-  if (!timeline || timeline.length === 0) {
-    return <EmptyTab message="No timeline events for this meter." />;
-  }
-  return (
-    <div className="relative">
-      <div className="absolute left-6 top-0 bottom-0 w-px bg-slate-800" />
-      <div className="space-y-6">
-        {timeline.map((event, i) => {
-          const eventStyle = EVENT_TYPE_STYLES[event.type] || EVENT_TYPE_STYLES.info;
-          const Icon = eventStyle.icon;
+      <section className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        {infoCards.map((card, idx) => {
+          const Icon = card.icon;
           return (
-            <div key={i} className="relative flex items-start gap-5 pl-0">
-              <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 z-10 ${eventStyle.bg}`}>
-                <Icon className={eventStyle.color} />
+            <div key={idx} className="bg-[#101827] border border-slate-800 rounded-2xl p-5 hover:border-cyan-500/30 transition-all duration-300">
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-slate-400 text-xs">{card.label}</p>
+                <Icon className={card.color} />
               </div>
-              <div className="flex-1 pt-2">
-                <p className="text-white font-medium">{event.event}</p>
-                <p className="text-slate-500 text-xs mt-1">{event.time}</p>
-              </div>
+              <p className="text-xl font-bold text-white">{card.value}</p>
             </div>
           );
         })}
-      </div>
-    </div>
-  );
-}
+      </section>
 
-function EmptyTab({ message }) {
-  return (
-    <div className="text-center py-12">
-      <FaInfoCircle className="text-4xl text-slate-600 mx-auto mb-3" />
-      <p className="text-slate-500">{message}</p>
-    </div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <section className="bg-[#101827] border border-slate-800 rounded-2xl p-6">
+          <h2 className="text-lg font-semibold text-white mb-5 flex items-center gap-2">
+            <FaExclamationTriangle className="text-red-400" /> Alerts
+          </h2>
+          {meter.alerts && meter.alerts.length > 0 ? (
+            <div className="space-y-3">
+              {meter.alerts.map((alert, idx) => (
+                <div key={idx} className="bg-[#0B1220] border border-slate-700 rounded-xl p-4">
+                  <div className="flex items-center justify-between mb-1">
+                    <span className={`px-2 py-0.5 rounded-full text-xs font-medium border ${getSeverityStyle(alert.severity)}`}>{alert.severity}</span>
+                    <span className="text-xs text-slate-500">{alert.time}</span>
+                  </div>
+                  <p className="text-sm text-slate-300 mt-2">{alert.message}</p>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-slate-500 text-sm">No active alerts.</p>
+          )}
+        </section>
+
+        <section className="bg-[#101827] border border-slate-800 rounded-2xl p-6">
+          <h2 className="text-lg font-semibold text-white mb-5 flex items-center gap-2">
+            <FaHistory className="text-cyan-400" /> History
+          </h2>
+          {meter.history && meter.history.length > 0 ? (
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-slate-700">
+                    <th className="text-left py-2 text-slate-400 text-xs font-medium">Date</th>
+                    <th className="text-left py-2 text-slate-400 text-xs font-medium">Load</th>
+                    <th className="text-left py-2 text-slate-400 text-xs font-medium">Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {meter.history.slice(0, 10).map((rec, idx) => (
+                    <tr key={idx} className="border-b border-slate-800">
+                      <td className="py-2 text-slate-300 text-sm">{rec.date}</td>
+                      <td className="py-2 text-slate-300 text-sm">{rec.load}</td>
+                      <td className="py-2">
+                        <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${getStatusStyle(rec.status)}`}>{rec.status}</span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <p className="text-slate-500 text-sm">No history available.</p>
+          )}
+        </section>
+
+        <section className="lg:col-span-2 bg-[#101827] border border-slate-800 rounded-2xl p-6">
+          <h2 className="text-lg font-semibold text-white mb-5 flex items-center gap-2">
+            <FaClock className="text-teal-400" /> Timeline
+          </h2>
+          {meter.timeline && meter.timeline.length > 0 ? (
+            <div className="relative">
+              <div className="absolute left-[19px] top-2 bottom-2 w-px bg-slate-700" />
+              <div className="space-y-5">
+                {meter.timeline.map((event, idx) => (
+                  <div key={idx} className="relative flex items-start gap-4">
+                    <div className="w-10 h-10 rounded-full bg-[#0B1220] border border-slate-700 flex items-center justify-center z-10">
+                      {getTimelineIcon(event.type)}
+                    </div>
+                    <div className="flex-1 pt-1">
+                      <p className="text-sm text-slate-400">{event.time}</p>
+                      <p className="text-white font-medium mt-0.5">{event.event}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <p className="text-slate-500 text-sm">No timeline events.</p>
+          )}
+        </section>
+      </div>
+    </DashboardLayout>
   );
 }
