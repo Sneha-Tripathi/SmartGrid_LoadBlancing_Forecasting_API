@@ -116,5 +116,24 @@ def _sanitize_user(user: dict) -> dict:
         "updated_at": user.get("updated_at", ""),
     }
 
+def deactivate_user(user_id: str, password: str) -> bool:
+    """
+    Deactivate a user account.
+
+    Verifies the password before deactivating.
+
+    Returns:
+        True if deactivated successfully, False if user not found or password incorrect.
+    """
+    user = _users.get(user_id)
+    if not user:
+        return False
+    if not verify_password(password, user["password"]):
+        return False
+    user["is_active"] = False
+    user["updated_at"] = datetime.now(timezone.utc).isoformat()
+    return True
+
+
 def get_all_users() -> List[dict]:
     return [_sanitize_user(u) for u in _users.values()]

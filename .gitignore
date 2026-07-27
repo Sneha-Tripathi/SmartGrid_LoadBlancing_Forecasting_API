@@ -17,3 +17,85 @@ __pycache__/
 
 logs/
 *.log
+
+# ====================================================
+# Merged from Sakshi_Project (missing configuration)
+# ====================================================
+
+# Python cache files (broader patterns)
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+*.egg
+
+# Build artifacts
+dist/
+build/
+develop-eggs/
+downloads/
+eggs/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.whl
+
+# Other virtual environments
+.venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# IDE files
+*.swp
+*.swo
+*~
+*.sublime-workspace
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+*.db-journal
+
+# Environment variants
+.env.local
+.env.*.local
+
+# Docker
+.dockerignore
+
+# Testing artifacts
+.pytest_cache/
+coverage/
+htmlcov/
+.cache/
+test_*.db
+.tox/
+.coverage
+coverage.xml
+*.cover
+.hypothesis/
+tests/.pytest_cache/
+
+# Distribution
+*.manifest
+*.spec
+MANIFEST
+
+# Docs build
+site/
+docs/_build/

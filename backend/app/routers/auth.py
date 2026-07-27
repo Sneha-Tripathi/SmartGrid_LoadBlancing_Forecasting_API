@@ -13,6 +13,7 @@ from app.schemas.auth import (
     UpdateProfileRequest,
     UserResponse,
     UserWithToken,
+    DeactivateAccountRequest,
 )
 from app.utils.auth import (
     create_access_token,
@@ -27,6 +28,7 @@ from app.services.auth_service import (
     get_user_by_id,
     update_user_profile,
     change_user_password,
+    deactivate_user,
     store_refresh_token,
     validate_refresh_token,
     revoke_refresh_token,
@@ -142,3 +144,11 @@ def change_password(payload: ChangePasswordRequest, user: dict = Depends(_get_cu
     if not success:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Current password is incorrect")
     return {"message": "Password changed successfully"}
+
+
+@router.post("/deactivate", status_code=status.HTTP_200_OK, summary="Deactivate account", description="Deactivate the authenticated user's account. Requires password confirmation.")
+def deactivate_account(payload: DeactivateAccountRequest, user: dict = Depends(_get_current_user)):
+    success = deactivate_user(user["id"], payload.password)
+    if not success:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Password is incorrect")
+    return {"success": True, "message": "Account deactivated successfully"}

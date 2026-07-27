@@ -41,6 +41,11 @@ class UserResponse(BaseModel):
     created_at: str
     updated_at: str
 
+class DeactivateAccountRequest(BaseModel):
+    """Schema for account deactivation confirmation."""
+    password: str
+
+
 class UserWithToken(UserResponse):
     access_token: str
     refresh_token: str

@@ -1,9 +1,17 @@
 from fastapi import FastAPI, WebSocket
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.core.config import settings
+from app.core.exceptions import register_exception_handlers
+from app.core.logging import configure_logging, get_logger
 from app.websocket import websocket_endpoint
 from app.api.status import router as status_router
-from app.routers import energy, analytics, meter, auth, alert, dashboard
+from app.routers import energy, analytics, meter, auth, alert, dashboard, health
+
+# Configure logging at startup
+configure_logging()
+
+logger = get_logger(__name__)
 
 # -------------------------------
 # FastAPI App
@@ -13,7 +21,19 @@ app = FastAPI(
     title="Smart Grid Load Balancing API",
     description="Dummy Backend for Smart Grid Load Balancing & Forecasting System",
     version="1.0.0",
+    contact={
+        "name": "Smart Grid Team",
+        "email": "team@smartgrid.io",
+        "url": "https://smartgrid.io",
+    },
+    license_info={
+        "name": "MIT",
+        "url": "https://opensource.org/licenses/MIT",
+    },
 )
+
+# Register exception handlers
+register_exception_handlers(app)
 
 # -------------------------------
 # Include Routers
@@ -26,6 +46,7 @@ app.include_router(meter.router)
 app.include_router(auth.router)
 app.include_router(alert.router)
 app.include_router(dashboard.router)
+app.include_router(health.router)
 
 # -------------------------------
 # CORS
@@ -114,6 +135,38 @@ def activity():
             "event": "Critical Alert Resolved",
         },
     ]
+
+# -------------------------------
+# Application Events
+# -------------------------------
+
+
+@app.on_event("startup")
+async def startup_event():
+    """Log application startup."""
+    logger.info(
+        "%s v%s is starting up",
+        settings.PROJECT_NAME,
+        settings.PROJECT_VERSION,
+    )
+    logger.info("Log level: %s", settings.LOG_LEVEL)
+    logger.info("Metrics enabled: %s", settings.ENABLE_METRICS)
+    logger.info("Rate limiting enabled: %s", settings.RATE_LIMIT_ENABLED)
+    logger.info("Application startup complete")
+
+
+@app.on_event("shutdown")
+async def shutdown_event():
+    """Log application shutdown."""
+    logger.info("%s is shutting down", settings.PROJECT_NAME)
+    metrics = metrics_collector.get_metrics()
+    logger.info(
+        "Session summary: %d requests processed, %d errors",
+        metrics["requests"]["total"],
+        metrics["errors"]["total"],
+    )
+    logger.info("Shutdown complete")
+
 
 # -------------------------------
 # WebSocket
