@@ -1,0 +1,19 @@
+venv/
+Lib/
+Scripts/
+Include/
+__pycache__/
+*.pyc
+.env
+.vscode/
+.idea/
+# Environment Variables
+.env
+
+# Virtual Environment
+venv/
+__pycache__/
+*.pyc
+
+logs/
+*.log
