@@ -1,0 +1,54 @@
+# ====================================================
+# Core Dependencies
+# ====================================================
+
+annotated-types==0.7.0
+anyio==4.14.2
+bcrypt==4.0.1
+celery==5.5.1
+click==8.4.2
+colorama==0.4.6
+fastapi==0.139.2
+greenlet==3.5.3
+h11==0.16.0
+httptools==0.8.0
+httpx==0.28.1
+idna==3.18
+passlib==1.7.4
+psycopg2-binary==2.9.12
+pydantic==2.13.4
+pydantic-core==2.46.4
+python-dotenv==1.2.2
+python-jose==3.3.0
+PyYAML==6.0.3
+pytest==8.3.5
+pytest-asyncio==0.25.3
+redis==5.0.8
+SQLAlchemy==2.0.51
+starlette==0.47.3
+typing-inspection==0.4.2
+typing_extensions==4.16.0
+uvicorn==0.51.0
+watchfiles==1.2.0
+websockets==16.1
+
+# ====================================================
+# Merged from Sakshi_Project (missing dependencies)
+# ====================================================
+
+# Database
+# (SQLAlchemy already present above - kept at 2.0.51)
+alembic==1.14.0
+
+# Validation
+pydantic-settings==2.7.0
+email-validator==2.2.0
+python-multipart==0.0.19
+
+# Testing
+pytest-cov==6.0.0
+
+# Code Quality (development)
+black==24.10.0
+ruff==0.8.0
+isort==5.13.2
