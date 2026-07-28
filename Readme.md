@@ -195,7 +195,7 @@ pip install -r requirements.txt
 
 Run
 
-uvicorn app.main:app --reload
+uvicorn main:app --reload
 
 ---
 
@@ -224,3 +224,50 @@ MIT License
 - Redis integration verified
 - FastAPI API tested successfully
 - Meter data stored successfully
+
+
+---
+
+# How to Run the Project
+
+## 1. Clone the Repository
+
+```bash
+git clone <repository-url>
+```
+
+## 2. Navigate to the Project
+
+```bash
+cd SmartGrid-System
+```
+
+## 3. Activate Virtual Environment (Windows)
+
+```bash
+.\venv\Scripts\activate
+```
+
+## 4. Move to Backend Folder
+
+```bash
+cd backend
+```
+
+## 5. Install Dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+## 6. Start Docker Services
+
+```bash
+docker compose up --build
+```
+
+## 7. Open Swagger UI
+
+```
+http://localhost:8000/docs
+```
