@@ -77,6 +77,11 @@ def register(payload: UserCreate):
     if user is None:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Email already registered")
     tokens = _create_tokens(user["id"])
+    try:
+        from app.routers.notifications import create_notification
+        create_notification(user["id"], "Welcome to Smart Grid", "Your account has been created successfully.", "login_success")
+    except Exception as e:
+        logger.warning(f"Failed to create notification: {e}")
     return {**user, **tokens, "token_type": "bearer"}
 
 
@@ -86,6 +91,11 @@ def login(payload: UserLogin):
     if user is None:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid email or password")
     tokens = _create_tokens(user["id"])
+    try:
+        from app.routers.notifications import create_notification
+        create_notification(user["id"], "Login Successful", f"Logged in as {user['email']}", "login_success")
+    except Exception as e:
+        logger.warning(f"Failed to create notification: {e}")
     return {**user, **tokens, "token_type": "bearer"}
 
 

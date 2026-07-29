@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   FaFileAlt,
   FaDownload,
@@ -10,11 +10,15 @@ import {
   FaFileExcel,
   FaRedo,
   FaSearch,
+  FaTrash,
+  FaSpinner,
 } from "react-icons/fa";
 import DashboardLayout from "../components/layout/DashboardLayout";
 import SkeletonLoader from "../components/common/SkeletonLoader";
 import EmptyState from "../components/common/EmptyState";
 import ErrorMessage from "../components/common/ErrorMessage";
+import toast from "react-hot-toast";
+import reportService from "../services/reportService";
 
 const REPORT_TYPES = [
   { id: "daily", label: "Daily Summary", icon: FaCalendarAlt, desc: "24-hour grid performance overview" },
@@ -25,14 +29,15 @@ const REPORT_TYPES = [
   { id: "efficiency", label: "Efficiency Report", icon: FaChartLine, desc: "Grid efficiency and AI optimization metrics" },
 ];
 
-const SAMPLE_REPORTS = [
-  { id: 1, title: "Grid Performance — Jul 25, 2025", type: "daily", date: "2025-07-25", size: "2.4 MB", status: "Generated" },
-  { id: 2, title: "Weekly Energy Consumption — W30", type: "weekly", date: "2025-07-21", size: "4.8 MB", status: "Generated" },
-  { id: 3, title: "Monthly Analysis — June 2025", type: "monthly", date: "2025-06-30", size: "8.2 MB", status: "Generated" },
-  { id: 4, title: "Zone Distribution — Q2 2025", type: "zones", date: "2025-06-30", size: "3.6 MB", status: "Generated" },
-  { id: 5, title: "Alert History — July 2025", type: "alerts", date: "2025-07-25", size: "1.2 MB", status: "Pending" },
-  { id: 6, title: "AI Efficiency Metrics — Jul 2025", type: "efficiency", date: "2025-07-25", size: "5.1 MB", status: "Generated" },
-];
+function formatDate(dateStr) {
+  if (!dateStr) return "";
+  try {
+    const d = new Date(dateStr);
+    return d.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
+  } catch {
+    return dateStr;
+  }
+}
 
 export default function Reports() {
   const [reports, setReports] = useState([]);
@@ -41,36 +46,117 @@ export default function Reports() {
   const [searchQuery, setSearchQuery] = useState("");
   const [filterType, setFilterType] = useState("all");
   const [generating, setGenerating] = useState(null);
+  const [downloading, setDownloading] = useState(null);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [total, setTotal] = useState(0);
+  const pageSize = 10;
+
+  const fetchReports = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const params = {
+        page,
+        page_size: pageSize,
+        sort_by: "date",
+        sort_order: "desc",
+      };
+      if (searchQuery) params.search = searchQuery;
+      if (filterType !== "all") params.type = filterType;
+
+      const data = await reportService.getReports(params);
+      setReports(data.items || []);
+      setTotalPages(data.total_pages || 1);
+      setTotal(data.total || 0);
+    } catch (err) {
+      console.error("Failed to load reports:", err);
+      setError(err);
+    } finally {
+      setLoading(false);
+    }
+  }, [page, searchQuery, filterType]);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setReports(SAMPLE_REPORTS);
-      setLoading(false);
-    }, 1000);
-    return () => clearTimeout(timer);
-  }, []);
+    fetchReports();
+  }, [fetchReports]);
 
-  const handleGenerate = (reportType) => {
+  const handleGenerate = async (reportType) => {
     setGenerating(reportType);
-    setTimeout(() => {
-      const newReport = {
-        id: Date.now(),
-        title: `${reportType} Report — ${new Date().toLocaleDateString()}`,
-        type: reportType,
-        date: new Date().toISOString().split("T")[0],
-        size: `${(Math.random() * 8 + 1).toFixed(1)} MB`,
-        status: "Generated",
-      };
+    try {
+      const newReport = await reportService.generateReport(reportType);
       setReports((prev) => [newReport, ...prev]);
+      setTotal((prev) => prev + 1);
+      toast.success(`${REPORT_TYPES.find((r) => r.id === reportType)?.label || reportType} report generated successfully`);
+    } catch (err) {
+      toast.error("Failed to generate report");
+    } finally {
       setGenerating(null);
-    }, 2000);
+    }
   };
 
-  const filteredReports = reports.filter((r) => {
-    if (filterType !== "all" && r.type !== filterType) return false;
-    if (searchQuery && !r.title.toLowerCase().includes(searchQuery.toLowerCase())) return false;
-    return true;
-  });
+  const handleDownloadPdf = async (reportId, e) => {
+    e.stopPropagation();
+    setDownloading(`pdf-${reportId}`);
+    try {
+      const blob = await reportService.downloadPdf(reportId);
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `report-${reportId}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+      toast.success("PDF downloaded successfully");
+    } catch (err) {
+      toast.error("Failed to download PDF");
+    } finally {
+      setDownloading(null);
+    }
+  };
+
+  const handleDownloadExcel = async (reportId, e) => {
+    e.stopPropagation();
+    setDownloading(`excel-${reportId}`);
+    try {
+      const blob = await reportService.downloadExcel(reportId);
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `report-${reportId}.xlsx`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+      toast.success("Excel downloaded successfully");
+    } catch (err) {
+      toast.error("Failed to download Excel");
+    } finally {
+      setDownloading(null);
+    }
+  };
+
+  const handleDelete = async (reportId) => {
+    try {
+      await reportService.deleteReport(reportId);
+      setReports((prev) => prev.filter((r) => r.id !== reportId));
+      setTotal((prev) => prev - 1);
+      toast.success("Report deleted");
+    } catch (err) {
+      toast.error("Failed to delete report");
+    }
+  };
+
+  const handleSearch = (e) => {
+    setSearchQuery(e.target.value);
+    setPage(1);
+  };
+
+  const handleFilterChange = (type) => {
+    setFilterType(type);
+    setPage(1);
+  };
 
   return (
     <DashboardLayout>
@@ -82,7 +168,6 @@ export default function Reports() {
           </h1>
           <p className="text-slate-400 mt-2">Generate and download grid performance reports.</p>
         </div>
-        
       </section>
 
       {/* Report Type Cards */}
@@ -94,7 +179,7 @@ export default function Reports() {
             <button key={rt.id} onClick={() => handleGenerate(rt.id)} disabled={isGenerating}
               className="bg-[#101827] border border-slate-800 rounded-2xl p-5 text-left hover:border-cyan-500/30 transition-all duration-300 hover:scale-[1.02] hover:shadow-xl hover:shadow-cyan-500/5 disabled:opacity-50 disabled:cursor-not-allowed group">
               <div className={`w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-600 to-teal-600 flex items-center justify-center mb-3 shadow-lg group-hover:shadow-cyan-500/20 transition`}>
-                <Icon className="text-white text-lg" />
+                {isGenerating ? <FaSpinner className="text-white text-lg animate-spin" /> : <Icon className="text-white text-lg" />}
               </div>
               <h3 className="text-white font-semibold text-sm">{rt.label}</h3>
               <p className="text-slate-500 text-xs mt-1">{rt.desc}</p>
@@ -113,12 +198,12 @@ export default function Reports() {
         <div className="flex flex-col sm:flex-row gap-4">
           <div className="flex-1 relative">
             <FaSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" />
-            <input type="text" placeholder="Search reports..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
+            <input type="text" placeholder="Search reports..." value={searchQuery} onChange={handleSearch}
               className="w-full bg-[#0B1220] border border-slate-700 rounded-xl pl-11 pr-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500/50 transition text-sm" />
           </div>
           <div className="flex gap-2 flex-wrap">
             {["all", "daily", "weekly", "monthly", "zones", "alerts", "efficiency"].map((t) => (
-              <button key={t} onClick={() => setFilterType(t)}
+              <button key={t} onClick={() => handleFilterChange(t)}
                 className={`px-3 py-1.5 rounded-lg text-xs font-medium capitalize transition ${filterType === t ? "bg-cyan-600 text-white" : "bg-slate-800 text-slate-400 hover:bg-slate-700"}`}>
                 {t}
               </button>
@@ -138,22 +223,22 @@ export default function Reports() {
       {error && !loading && (
         <section className="mb-8">
           <ErrorMessage title="Failed to Load Reports" message={error.message || "Unable to fetch report data."} />
-          <button onClick={() => { setError(null); setLoading(true); }} className="mt-4 px-4 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white transition text-sm">Retry</button>
+          <button onClick={fetchReports} className="mt-4 px-4 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white transition text-sm">Retry</button>
         </section>
       )}
 
       {/* Empty State */}
-      {!loading && !error && filteredReports.length === 0 && (
+      {!loading && !error && reports.length === 0 && (
         <section>
           <EmptyState title="No Reports Found" description={searchQuery ? "No reports match your search." : "No reports generated yet. Click a report type above to generate one."} />
         </section>
       )}
 
       {/* Reports List */}
-      {!loading && !error && filteredReports.length > 0 && (
+      {!loading && !error && reports.length > 0 && (
         <section className="bg-[#101827] border border-slate-800 rounded-2xl overflow-hidden">
           <div className="p-5 border-b border-slate-800">
-            <h2 className="text-lg font-semibold text-white">Generated Reports ({filteredReports.length})</h2>
+            <h2 className="text-lg font-semibold text-white">Generated Reports ({total})</h2>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full">
@@ -168,7 +253,7 @@ export default function Reports() {
                 </tr>
               </thead>
               <tbody>
-                {filteredReports.map((report) => (
+                {reports.map((report) => (
                   <tr key={report.id} className="border-b border-slate-800 hover:bg-slate-800/40 transition">
                     <td className="py-4 px-5">
                       <div className="flex items-center gap-3">
@@ -179,7 +264,7 @@ export default function Reports() {
                     <td className="py-4 px-5">
                       <span className="capitalize text-slate-300 text-sm">{report.type}</span>
                     </td>
-                    <td className="py-4 px-5 text-slate-300 text-sm">{report.date}</td>
+                    <td className="py-4 px-5 text-slate-300 text-sm">{formatDate(report.date)}</td>
                     <td className="py-4 px-5 text-slate-300 text-sm">{report.size}</td>
                     <td className="py-4 px-5">
                       <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${report.status === "Generated" ? "bg-emerald-500/15 text-emerald-400" : "bg-amber-500/15 text-amber-400"}`}>
@@ -188,14 +273,28 @@ export default function Reports() {
                     </td>
                     <td className="py-4 px-5 text-right">
                       <div className="flex items-center justify-end gap-2">
-                        <button className="p-2 rounded-lg text-slate-400 hover:text-cyan-400 hover:bg-cyan-500/10 transition" title="Download PDF">
-                          <FaFilePdf />
+                        <button
+                          onClick={(e) => handleDownloadPdf(report.id, e)}
+                          disabled={downloading === `pdf-${report.id}`}
+                          className="p-2 rounded-lg text-slate-400 hover:text-cyan-400 hover:bg-cyan-500/10 transition disabled:opacity-50"
+                          title="Download PDF"
+                        >
+                          {downloading === `pdf-${report.id}` ? <FaSpinner className="animate-spin" /> : <FaFilePdf />}
                         </button>
-                        <button className="p-2 rounded-lg text-slate-400 hover:text-emerald-400 hover:bg-emerald-500/10 transition" title="Download Excel">
-                          <FaFileExcel />
+                        <button
+                          onClick={(e) => handleDownloadExcel(report.id, e)}
+                          disabled={downloading === `excel-${report.id}`}
+                          className="p-2 rounded-lg text-slate-400 hover:text-emerald-400 hover:bg-emerald-500/10 transition disabled:opacity-50"
+                          title="Download Excel"
+                        >
+                          {downloading === `excel-${report.id}` ? <FaSpinner className="animate-spin" /> : <FaFileExcel />}
                         </button>
-                        <button className="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition" title="Download">
-                          <FaDownload />
+                        <button
+                          onClick={() => handleDelete(report.id)}
+                          className="p-2 rounded-lg text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition"
+                          title="Delete"
+                        >
+                          <FaTrash />
                         </button>
                       </div>
                     </td>
@@ -204,6 +303,31 @@ export default function Reports() {
               </tbody>
             </table>
           </div>
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="p-5 border-t border-slate-800 flex items-center justify-between">
+              <span className="text-slate-400 text-sm">
+                Page {page} of {totalPages} ({total} total)
+              </span>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setPage((p) => Math.max(1, p - 1))}
+                  disabled={page <= 1}
+                  className="px-3 py-1.5 rounded-lg bg-slate-800 text-slate-400 hover:bg-slate-700 disabled:opacity-50 text-sm"
+                >
+                  Previous
+                </button>
+                <button
+                  onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                  disabled={page >= totalPages}
+                  className="px-3 py-1.5 rounded-lg bg-slate-800 text-slate-400 hover:bg-slate-700 disabled:opacity-50 text-sm"
+                >
+                  Next
+                </button>
+              </div>
+            </div>
+          )}
         </section>
       )}
     </DashboardLayout>

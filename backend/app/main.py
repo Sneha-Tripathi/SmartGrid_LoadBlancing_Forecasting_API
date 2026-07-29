@@ -6,7 +6,18 @@ from app.core.exceptions import register_exception_handlers
 from app.core.logging import configure_logging, get_logger
 from app.websocket import websocket_endpoint
 from app.api.status import router as status_router
-from app.routers import energy, analytics, meter, auth, alert, dashboard, health
+from app.routers import (
+    energy,
+    analytics,
+    meter,
+    auth,
+    alert,
+    dashboard,
+    health,
+    reports,
+    settings as settings_router,
+    notifications,
+)
 
 # Configure logging at startup
 configure_logging()
@@ -47,6 +58,9 @@ app.include_router(auth.router)
 app.include_router(alert.router)
 app.include_router(dashboard.router)
 app.include_router(health.router)
+app.include_router(reports.router)
+app.include_router(settings_router.router)
+app.include_router(notifications.router)
 
 # -------------------------------
 # CORS

@@ -24,6 +24,22 @@ app = FastAPI(
 
 
 # =====================================================
+# Include New Routers (from app subpackage)
+# =====================================================
+
+# Include new functional routers (reports, settings, notifications)
+# These are standalone routers that don't conflict with existing main.py routes
+try:
+    from app.routers.reports import router as reports_router
+    app.include_router(reports_router)
+    from app.routers.settings import router as settings_router
+    app.include_router(settings_router)
+    from app.routers.notifications import router as notifications_router
+    app.include_router(notifications_router)
+except ImportError as e:
+    logger.warning(f"Optional app subpackage routers not available: {e}")
+
+# =====================================================
 # Database Dependency
 # =====================================================
 

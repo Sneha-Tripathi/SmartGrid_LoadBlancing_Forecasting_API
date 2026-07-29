@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   FaCog,
   FaPalette,
@@ -15,41 +15,118 @@ import DashboardLayout from "../components/layout/DashboardLayout";
 import SkeletonLoader from "../components/common/SkeletonLoader";
 import ErrorMessage from "../components/common/ErrorMessage";
 import toast from "react-hot-toast";
+import settingsService from "../services/settingsService";
+import { useTheme } from "../context/ThemeContext";
 
 export default function Settings() {
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [saving, setSaving] = useState({});
+  const { theme: contextTheme, toggleTheme } = useTheme();
 
   const [settings, setSettings] = useState({
-    // Display
     theme: "dark",
     language: "en",
     timezone: "UTC",
     compactView: false,
-    // Notifications
     emailAlerts: true,
     pushAlerts: true,
     criticalAlerts: true,
     weeklyDigest: false,
-    // System
     autoRefresh: true,
     refreshInterval: "30",
     dataRetention: "90",
-    // Security
     twoFactor: false,
     sessionTimeout: "30",
   });
 
+  useEffect(() => {
+    const loadSettings = async () => {
+      try {
+        // Load from localStorage first for instant display
+        const storedTheme = localStorage.getItem("theme");
+        const storedCompact = localStorage.getItem("compactView");
+        const storedSettings = localStorage.getItem("sg-settings");
+        
+        if (storedSettings) {
+          const parsed = JSON.parse(storedSettings);
+          setSettings((prev) => ({ ...prev, ...parsed }));
+        }
+        if (storedTheme) {
+          setSettings((prev) => ({ ...prev, theme: storedTheme }));
+        }
+        if (storedCompact) {
+          setSettings((prev) => ({ ...prev, compactView: storedCompact === "true" }));
+        }
+
+        // Then load from backend for authoritative data
+        const data = await settingsService.getSettings();
+        setSettings((prev) => ({ ...prev, ...data }));
+        localStorage.setItem("sg-settings", JSON.stringify(data));
+        localStorage.setItem("theme", data.theme);
+        localStorage.setItem("compactView", String(data.compactView));
+      } catch (err) {
+        console.warn("Settings API unavailable, using local storage");
+        // Continue with localStorage values
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadSettings();
+  }, []);
+
   const handleChange = (key, value) => {
-    setSettings((prev) => ({ ...prev, [key]: value }));
+    setSettings((prev) => {
+      const updated = { ...prev, [key]: value };
+      
+      // Persist theme immediately to localStorage
+      if (key === "theme") {
+        localStorage.setItem("theme", value);
+        document.documentElement.setAttribute("data-theme", value);
+        // Also update ThemeContext
+        if (value === "light" && contextTheme === "dark") toggleTheme();
+        else if (value === "dark" && contextTheme === "light") toggleTheme();
+      }
+      if (key === "compactView") {
+        localStorage.setItem("compactView", String(value));
+      }
+      
+      // Save all settings to localStorage
+      localStorage.setItem("sg-settings", JSON.stringify(updated));
+      
+      return updated;
+    });
   };
 
   const handleSave = async (section) => {
     setSaving((prev) => ({ ...prev, [section]: true }));
-    await new Promise((resolve) => setTimeout(resolve, 800));
-    setSaving((prev) => ({ ...prev, [section]: false }));
-    toast.success(`${section} settings saved successfully`);
+    try {
+      // Map section to relevant keys
+      const sectionKeys = {
+        display: ["theme", "language", "timezone", "compactView"],
+        notifications: ["emailAlerts", "pushAlerts", "criticalAlerts", "weeklyDigest"],
+        system: ["autoRefresh", "refreshInterval", "dataRetention"],
+        security: ["twoFactor", "sessionTimeout"],
+      };
+
+      const keysToSave = sectionKeys[section] || [];
+      const payload = {};
+      for (const key of keysToSave) {
+        payload[key] = settings[key];
+      }
+
+      await settingsService.updateSettings(payload);
+      
+      // Persist to localStorage
+      const existing = JSON.parse(localStorage.getItem("sg-settings") || "{}");
+      localStorage.setItem("sg-settings", JSON.stringify({ ...existing, ...payload }));
+
+      toast.success(`${section.charAt(0).toUpperCase() + section.slice(1)} settings saved successfully`);
+    } catch (err) {
+      toast.error("Failed to save settings");
+    } finally {
+      setSaving((prev) => ({ ...prev, [section]: false }));
+    }
   };
 
   if (loading) {
@@ -139,7 +216,6 @@ export default function Settings() {
           </h1>
           <p className="text-slate-400 mt-2">Configure your Smart Grid dashboard preferences.</p>
         </div>
-        
       </section>
 
       <div className="space-y-8">
@@ -222,4 +298,3 @@ export default function Settings() {
     </DashboardLayout>
   );
 }
-
